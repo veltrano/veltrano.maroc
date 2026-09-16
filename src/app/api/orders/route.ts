@@ -8,6 +8,7 @@ import {
   type Order,
 } from "@/lib/order";
 import { orderWhatsAppMessage } from "@/lib/order-message";
+import { redeemableCoupon } from "@/lib/coupon-redeem";
 import { mutateStore } from "@/lib/store";
 import { deliverOrderWhatsApp } from "@/lib/whatsapp-send";
 
@@ -45,18 +46,24 @@ export async function POST(req: Request) {
   }
 
   const created = await mutateStore((data) => {
+    const code = String(body.coupon ?? "").trim();
+    if (code) {
+      const result = redeemableCoupon(data.coupons, data.orders, code);
+      if (!result.ok) return { error: result.error };
+    }
+
     const id = `VT-${Date.now().toString(36).toUpperCase()}`;
     const subtotalMad = cartSubtotal(sanitized);
-    const code = String(body.coupon ?? "").trim().toUpperCase();
     let discountMad = 0;
     let appliedCoupon: string | undefined;
     if (code) {
-      const coupon = data.coupons.find((c) => c.code === code && !c.usedAt);
-      if (coupon && subtotalMad > 0) {
-        discountMad = coupon.amountMad;
-        appliedCoupon = code;
-        coupon.usedAt = new Date().toISOString();
-        coupon.usedOnOrderId = id;
+      const result = redeemableCoupon(data.coupons, data.orders, code);
+      if (!result.ok) return { error: result.error };
+      if (subtotalMad > 0) {
+        discountMad = result.coupon.amountMad;
+        appliedCoupon = result.coupon.code;
+        result.coupon.usedAt = new Date().toISOString();
+        result.coupon.usedOnOrderId = id;
       }
     }
     const used = new Set(data.coupons.map((c) => c.code));
@@ -84,14 +91,18 @@ export async function POST(req: Request) {
       whatsapp: { status: "queued" },
     };
     data.orders = [order, ...data.orders];
-    return order;
+    return { order };
   });
 
-  const whatsapp = await deliverOrderWhatsApp(created, orderWhatsAppMessage(created));
+  if ("error" in created) {
+    return NextResponse.json({ error: created.error }, { status: 400 });
+  }
+
+  const whatsapp = await deliverOrderWhatsApp(created.order, orderWhatsAppMessage(created.order));
   const saved = await mutateStore((data) => {
-    const i = data.orders.findIndex((o) => o.id === created.id);
+    const i = data.orders.findIndex((o) => o.id === created.order.id);
     if (i >= 0) data.orders[i] = { ...data.orders[i], whatsapp };
-    return data.orders[i] ?? { ...created, whatsapp };
+    return data.orders[i] ?? { ...created.order, whatsapp };
   });
 
   return NextResponse.json({ order: saved });

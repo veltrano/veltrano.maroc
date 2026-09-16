@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PRODUCTS, displayName, mad } from "@/data/catalog";
 import { linePrice, lineProduct } from "@/lib/cart";
-import { COUPON_VALUE_MAD, saveIssuedCoupon } from "@/lib/coupons";
+import { COUPON_VALUE_MAD, markCouponUsed, saveIssuedCoupon } from "@/lib/coupons";
 import type { Order } from "@/lib/order";
 import { ProductCard } from "@/components/product-card";
 import { buttonVariants } from "@/components/ui/button";
@@ -29,6 +29,9 @@ export default function ThankYouPage() {
         if (!cancelled) {
           setOrder(json.order);
           saveIssuedCoupon(json.order.rewardCoupon, json.order.id);
+          if (json.order.appliedCoupon) {
+            markCouponUsed(json.order.appliedCoupon, json.order.id);
+          }
           setStatus("ok");
         }
       } catch {

@@ -1,3 +1,5 @@
+import { COUPON_ALREADY_USED, COUPON_EMPTY, COUPON_INVALID } from "@/lib/coupon-redeem";
+
 export const COUPON_VALUE_MAD = 50;
 
 export type Coupon = {
@@ -36,12 +38,14 @@ export function findCoupon(code: string) {
 
 export function unusedCoupon(code: string) {
   const c = findCoupon(code);
-  return c && !c.usedAt ? c : undefined;
+  return c && !c.usedAt && !c.usedOnOrderId ? c : undefined;
 }
 
 export function saveIssuedCoupon(code: string, orderId: string, amountMad = COUPON_VALUE_MAD) {
   const n = code.trim().toUpperCase();
   if (!n) return;
+  const existing = findCoupon(n);
+  if (existing?.usedAt || existing?.usedOnOrderId) return;
   const list = readCoupons().filter((c) => c.code !== n);
   writeCoupons([
     {
@@ -56,6 +60,11 @@ export function saveIssuedCoupon(code: string, orderId: string, amountMad = COUP
 
 export function rememberValidCoupon(code: string, amountMad = COUPON_VALUE_MAD) {
   const n = code.trim().toUpperCase();
+  const existing = findCoupon(n);
+  if (existing?.usedAt || existing?.usedOnOrderId) {
+    setAppliedCode(null);
+    return;
+  }
   if (!unusedCoupon(n)) {
     saveIssuedCoupon(n, "remote", amountMad);
   }
@@ -64,13 +73,24 @@ export function rememberValidCoupon(code: string, amountMad = COUPON_VALUE_MAD) 
 
 export function markCouponUsed(code: string, usedOnOrderId: string) {
   const n = code.trim().toUpperCase();
-  writeCoupons(
-    readCoupons().map((c) =>
-      c.code === n
-        ? { ...c, usedAt: new Date().toISOString(), usedOnOrderId }
-        : c
-    )
-  );
+  if (!n) return;
+  const list = readCoupons();
+  const i = list.findIndex((c) => c.code === n);
+  const stamp = { usedAt: new Date().toISOString(), usedOnOrderId };
+  if (i < 0) {
+    writeCoupons([
+      {
+        code: n,
+        amountMad: COUPON_VALUE_MAD,
+        orderId: usedOnOrderId,
+        createdAt: new Date().toISOString(),
+        ...stamp,
+      },
+      ...list,
+    ]);
+    return;
+  }
+  writeCoupons(list.map((c, idx) => (idx === i ? { ...c, ...stamp } : c)));
 }
 
 export function getAppliedCode() {
@@ -85,25 +105,47 @@ export function setAppliedCode(code: string | null) {
 
 export function applyCouponInput(raw: string): { ok: true; code: string } | { ok: false; error: string } {
   const code = raw.trim().toUpperCase();
-  if (!code) return { ok: false, error: "Entre un code." };
-  const c = unusedCoupon(code);
-  if (!c) return { ok: false, error: "Code invalide ou déjà utilisé." };
+  if (!code) return { ok: false, error: COUPON_EMPTY };
+  const existing = findCoupon(code);
+  if (existing?.usedAt || existing?.usedOnOrderId) {
+    setAppliedCode(null);
+    return { ok: false, error: COUPON_ALREADY_USED };
+  }
+  if (!existing) return { ok: false, error: COUPON_INVALID };
   setAppliedCode(code);
   return { ok: true, code };
 }
 
 export async function applyCouponRemote(raw: string) {
   const code = raw.trim().toUpperCase();
-  if (!code) return { ok: false as const, error: "Entre un code." };
+  if (!code) return { ok: false as const, error: COUPON_EMPTY };
   try {
     const res = await fetch(`/api/coupons/${encodeURIComponent(code)}`);
-    const json = (await res.json()) as { ok?: boolean; code?: string; amountMad?: number; error?: string };
+    const json = (await res.json()) as {
+      ok?: boolean;
+      code?: string;
+      amountMad?: number;
+      error?: string;
+      used?: boolean;
+    };
     if (res.ok && json.ok && json.code) {
       rememberValidCoupon(json.code, json.amountMad ?? COUPON_VALUE_MAD);
       return { ok: true as const, code: json.code };
     }
+    if (json.used || json.error) {
+      if (json.used) {
+        markCouponUsed(code, "remote");
+        setAppliedCode(null);
+      }
+    return { ok: false as const, error: json.error || COUPON_INVALID };
+    }
   } catch {
-    /* fall through to local cache */
+    /* server unreachable: still refuse a locally used code */
+  }
+  const local = findCoupon(code);
+  if (local?.usedAt || local?.usedOnOrderId) {
+    setAppliedCode(null);
+    return { ok: false as const, error: COUPON_ALREADY_USED };
   }
   return applyCouponInput(code);
 }

@@ -28,10 +28,17 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const code = getAppliedCode();
-    if (code) {
-      setApplied(code);
-      setCouponInput(code);
-    }
+    if (!code) return;
+    applyCouponRemote(code).then((result) => {
+      if (result.ok) {
+        setApplied(result.code);
+        setCouponInput(result.code);
+      } else {
+        setApplied(null);
+        setCouponInput(code);
+        if (result.error) setCouponMsg(result.error);
+      }
+    });
   }, []);
 
   async function onCoupon(e: FormEvent) {
