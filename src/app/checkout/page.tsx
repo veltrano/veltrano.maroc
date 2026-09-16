@@ -63,15 +63,15 @@ export default function CheckoutPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Téléphone</Label>
-          <Input id="phone" name="phone" required inputMode="tel" />
+          <Input id="phone" name="phone" required inputMode="tel" className="h-10" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="city">Ville</Label>
-          <Input id="city" name="city" required />
+          <Input id="city" name="city" required className="h-10" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="address">Adresse</Label>
-          <Input id="address" name="address" required />
+          <Input id="address" name="address" required className="h-10" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="notes">Notes</Label>
