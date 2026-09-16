@@ -28,7 +28,7 @@ Sans photos, chaque fiche affiche un placeholder teinté.
 
 ## Parcours
 
-- Home (lifestyle, 4 pièces, films clients), Boutique, Homme, Femme (coming soon)
+- Accueil (lifestyle, 4 pièces, films clients), Boutique, Homme, Femme (bientôt)
 - Grille boutique, filtres coupe / couleur
 - Fiche produit : galerie, pack 1 ou 2 (tailles distinctes sur le duo), stock
 - Panier et commande locale (pas de paiement en ligne)

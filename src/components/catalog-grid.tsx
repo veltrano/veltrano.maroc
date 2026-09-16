@@ -53,7 +53,7 @@ export function CatalogGrid() {
 
       {items.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">
-          Aucun jean pour ce filtre. Réinitialisez la coupe ou la couleur.
+          Aucun jean pour ce filtre. Réinitialise la coupe ou la couleur.
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">

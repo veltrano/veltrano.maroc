@@ -13,7 +13,7 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col gap-2">
           <Link href="/" className="hover:text-foreground">
-            Home
+            Accueil
           </Link>
           <Link href="/boutique" className="hover:text-foreground">
             Boutique

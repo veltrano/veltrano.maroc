@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { displayName, mad, packPrice, type Product } from "@/data/catalog";
+import { displayName, fitLabel, mad, packPrice, type Product } from "@/data/catalog";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ export function ProductDetail({ product }: { product: Product }) {
       <div className="space-y-6">
         <div>
           <p className="text-sm uppercase tracking-widest text-muted-foreground">
-            {product.fit === "baggy" ? "Baggy" : "Straight fit"}
+            {fitLabel(product.fit)}
           </p>
           <h1 className="font-heading mt-1 text-4xl capitalize">{product.colour}</h1>
           <p className="mt-3 text-lg">
@@ -94,9 +94,9 @@ export function ProductDetail({ product }: { product: Product }) {
           <p className="text-muted-foreground">{product.description}</p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Jean {product.fit} teinte {product.colour}. Tailles {product.sizes[0]} à{" "}
-            {product.sizes[product.sizes.length - 1]}. Description catalogue vide — on
-            affiche uniquement les champs officiels.
+            Jean {fitLabel(product.fit).toLowerCase()} teinte {product.colour}. Tailles{" "}
+            {product.sizes[0]} à {product.sizes[product.sizes.length - 1]}. Description
+            catalogue vide — on affiche uniquement les champs officiels.
           </p>
         )}
 

@@ -129,10 +129,14 @@ export const PRODUCTS: Product[] = [
   };
 });
 
+export function fitLabel(fit: Fit) {
+  return fit === "baggy" ? "Baggy" : "Coupe droite";
+}
+
 export const FITS: { id: Fit | "all"; label: string }[] = [
-  { id: "all", label: "Tous les coupes" },
+  { id: "all", label: "Toutes les coupes" },
   { id: "baggy", label: "Baggy" },
-  { id: "straight", label: "Straight fit" },
+  { id: "straight", label: "Coupe droite" },
 ];
 
 export function productBySlug(slug: string) {
@@ -140,8 +144,7 @@ export function productBySlug(slug: string) {
 }
 
 export function displayName(product: Product) {
-  if (product.fit === "baggy") return `Baggy · ${product.colour}`;
-  return `Straight fit · ${product.colour}`;
+  return `${fitLabel(product.fit)} · ${product.colour}`;
 }
 
 export function packPrice(quantity: number) {

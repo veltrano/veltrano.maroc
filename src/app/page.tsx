@@ -13,7 +13,7 @@ export default function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/lifestyle/hassan-ii-jeans.png"
-          alt="Veltrano jeans, Hassan II"
+          alt="Jeans Veltrano devant Hassan II"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/35" />
@@ -23,7 +23,7 @@ export default function HomePage() {
             Le jean qu’on te demande dans la rue.
           </h1>
           <p className="mt-5 max-w-lg text-base text-white/90 sm:text-lg">
-            Coupes baggy et straight, matière qui tient, prix clair : {mad(250)} le jean,
+            Coupes baggy et droite, matière qui tient, prix clair : {mad(250)} le jean,{" "}
             {mad(400)} le pack de 2. La ligne grandit — Homme maintenant, Femme bientôt.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -47,7 +47,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Introduction</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Présentation</p>
         <h2 className="font-heading mt-3 text-3xl sm:text-4xl">
           La marque marocaine qui te vaut les compliments que tu mérites.
         </h2>
@@ -61,7 +61,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">New arrivals</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Nouveautés</p>
             <h2 className="font-heading mt-2 text-3xl">À porter maintenant</h2>
           </div>
           <Link href="/boutique" className="hidden text-sm underline sm:inline">
@@ -84,17 +84,17 @@ export default function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/lifestyle/medina-jeans.png"
-          alt="Veltrano jeans en médina"
+          alt="Jeans Veltrano en médina"
           className="h-full min-h-[320px] w-full object-cover"
         />
         <div className="flex flex-col justify-center bg-white px-6 py-16 sm:px-12">
-          <h2 className="font-heading text-3xl sm:text-4xl">Coupe, wash, attitude.</h2>
+          <h2 className="font-heading text-3xl sm:text-4xl">Coupe, wash, allure.</h2>
           <p className="mt-4 max-w-md text-muted-foreground">
             Des jeans pensés pour la ville — médina, corniche, soirée. On construit la
             garde-robe pièce par pièce. Reviens souvent : d’autres modèles arrivent.
           </p>
           <Link href="/homme" className={cn(buttonVariants({ size: "lg" }), "mt-8 inline-flex w-fit")}>
-            Shop Homme
+            Boutique Homme
           </Link>
         </div>
       </section>
@@ -135,7 +135,7 @@ export default function HomePage() {
           </div>
           <div>
             <h3 className="font-medium">Denim qui tient</h3>
-            <p className="mt-1 text-muted-foreground">Baggy et straight, tailles du quotidien.</p>
+            <p className="mt-1 text-muted-foreground">Baggy et coupe droite, tailles du quotidien.</p>
           </div>
         </div>
       </section>

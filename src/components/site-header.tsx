@@ -15,7 +15,7 @@ import { cartUnitCount, useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
 
 const topLinks = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Accueil" },
   { href: "/boutique", label: "Boutique" },
 ];
 
@@ -61,7 +61,7 @@ export function SiteHeader() {
               )}
               aria-haspopup="true"
             >
-              Category
+              Catégorie
               <ChevronDown className="size-3.5" />
             </button>
             <div className="invisible absolute left-0 top-full z-50 min-w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
@@ -113,7 +113,7 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <p className="pt-2 text-xs uppercase tracking-widest text-muted-foreground">
-                  Category
+                  Catégorie
                 </p>
                 {categories.map((c) => (
                   <Link key={c.href} href={c.href} className="text-lg">

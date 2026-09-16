@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { mad } from "@/data/catalog";
+import { displayName, mad, productBySlug } from "@/data/catalog";
 import { cartDiscount, cartSubtotal, cartTotal, cartUnitCount, useCart } from "@/lib/cart";
 import { applyCouponInput, getAppliedCode, setAppliedCode } from "@/lib/coupons";
 import { customerWhatsAppUrl } from "@/lib/whatsapp";
@@ -39,7 +39,7 @@ export default function CheckoutPage() {
     const result = applyCouponInput(couponInput);
     if (result.ok) {
       setApplied(result.code);
-      setCouponMsg(`Code ${result.code} applied (−${mad(50)}).`);
+      setCouponMsg(`Code ${result.code} appliqué (−${mad(50)}).`);
       setError("");
     } else {
       setCouponMsg(result.error);
@@ -74,7 +74,7 @@ export default function CheckoutPage() {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <h1 className="font-heading text-3xl">Rien à commander</h1>
-        <p className="mt-3 text-muted-foreground">Votre panier est vide.</p>
+        <p className="mt-3 text-muted-foreground">Ton panier est vide.</p>
         <Link href="/boutique" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Boutique
         </Link>
@@ -121,13 +121,17 @@ export default function CheckoutPage() {
           {cartUnitCount(lines)} pièce{cartUnitCount(lines) > 1 ? "s" : ""}
         </p>
         <ul className="mt-4 space-y-2 text-sm">
-          {lines.map((l) => (
-            <li key={l.id} className="flex justify-between gap-4">
-              <span className="capitalize">
-                {l.slug.replace(/-/g, " ")} · {l.pack === "duo" ? "duo" : "unité"} × {l.quantity}
-              </span>
-            </li>
-          ))}
+          {lines.map((l) => {
+            const p = productBySlug(l.slug);
+            return (
+              <li key={l.id} className="flex justify-between gap-4">
+                <span>
+                  {p ? displayName(p) : l.slug.replace(/-/g, " ")} ·{" "}
+                  {l.pack === "duo" ? "pack de 2" : "1 jean"} × {l.quantity}
+                </span>
+              </li>
+            );
+          })}
         </ul>
         <form className="mt-6 space-y-2" onSubmit={onCoupon}>
           <Label htmlFor="coupon">Code promo</Label>

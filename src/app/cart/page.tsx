@@ -54,7 +54,7 @@ export default function CartPage() {
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <h1 className="font-heading text-3xl">Panier vide</h1>
         <p className="mt-3 text-muted-foreground">
-          Ajoutez un jean baggy ou straight fit pour commencer une commande.
+          Ajoute un jean baggy ou coupe droite pour commencer une commande.
         </p>
         <Link href="/boutique" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Voir la boutique

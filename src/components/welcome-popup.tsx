@@ -36,8 +36,8 @@ export function WelcomePopup() {
             −10% sur ta première commande
           </DialogTitle>
           <DialogDescription>
-            Laisse ton email. On t’écrit quand les nouveautés drop — Homme maintenant,
-            Femme très bientôt.
+            Laisse ton email. On t’écrit dès que les nouveautés arrivent — Homme
+            maintenant, Femme très bientôt.
           </DialogDescription>
         </DialogHeader>
         <EmailCapture idPrefix="popup" />

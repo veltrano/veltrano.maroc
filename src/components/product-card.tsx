@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { displayName, mad, type Product } from "@/data/catalog";
+import { displayName, fitLabel, mad, type Product } from "@/data/catalog";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export function ProductCard({
           ) : null}
         </div>
         <div className="mt-3 space-y-1">
-          <p className="text-sm capitalize text-muted-foreground">{product.fit}</p>
+          <p className="text-sm text-muted-foreground">{fitLabel(product.fit)}</p>
           <h3 className="font-heading text-lg capitalize leading-tight">{product.colour}</h3>
           <p className="text-sm">
             {mad(product.unitPriceMad)} · pack 2 {mad(product.duoPriceMad)}
