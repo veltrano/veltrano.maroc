@@ -4,6 +4,8 @@ set -e
 export HOSTNAME="${HOSTNAME:-${HOST:-0.0.0.0}}"
 export PORT="${PORT:-3000}"
 export DATA_DIR="${DATA_DIR:-/app/data/store}"
+export NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://veltrano.ma}"
+export SITE_URL="${SITE_URL:-${NEXT_PUBLIC_SITE_URL}}"
 mkdir -p "$DATA_DIR" /app/public/products
 if [ "$(id -u)" = "0" ]; then
   chown -R nextjs:nodejs "$DATA_DIR" 2>/dev/null || true

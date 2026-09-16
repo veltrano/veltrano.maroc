@@ -8,6 +8,9 @@ RUN npm ci
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_SITE_URL=https://veltrano.ma
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV SITE_URL=$NEXT_PUBLIC_SITE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx next build
@@ -19,6 +22,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV DATA_DIR=/app/data/store
+ENV NEXT_PUBLIC_SITE_URL=https://veltrano.ma
+ENV SITE_URL=https://veltrano.ma
 
 RUN apk add --no-cache su-exec \
   && addgroup -g 1001 -S nodejs \

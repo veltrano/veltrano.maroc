@@ -37,5 +37,5 @@ Without Meta or Twilio credentials, the French recap (`Hello M. {name}` + order 
 - Coupons: `VT50-XXXXXX`, 50 DH, one-time, apply in cart/checkout. Issued on each order for the *next* purchase (server + local cache).
 - Thank-you route: `/thank-you/[id]` loads the order from `GET /api/orders/[id]`.
 - Popup 5s after visit start. Dev server port **43127**.
-- Production: Docker standalone (`output: "standalone"`), listen on EasyPanel `PORT`/`HOST`, persist `DATA_DIR` (default `data/store`). GitHub must not include `public/products` (~720MB); mount that folder on the VPS. Lifestyle + client videos are in git.
-- Go-live still needs: GitHub repo URL, EasyPanel URL/domain, `gh auth` on this machine. Do not invent a remote. Site is not live until a public URL responds.
+- Production: Docker standalone, EasyPanel project `veltrano` at `http://187.6.164.52:3000/`, domain `https://veltrano.ma` (+ www). GitHub `https://github.com/veltrano/veltrano.maroc.git`. Persist volume `/app/data/store` (`DATA_DIR`). `NEXT_PUBLIC_SITE_URL` / `SITE_URL` / `CORS_ORIGINS` allow apex + www. Postgres `veltrano-db` / `DATABASE_URL` is optional and unused — orders stay JSON until a migration exists. Catalogue photos (~720MB) are not in git; mount `/app/public/products` on the VPS.
+- Do not claim https://veltrano.ma is live until the public URL responds. Push to GitHub requires `gh auth login` on this machine.
