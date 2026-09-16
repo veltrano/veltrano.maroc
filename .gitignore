@@ -47,7 +47,6 @@ next-env.d.ts
 # Server-side order store (customer PII)
 /data/store/*.json
 
-# Catalogue Drive photos (~720MB) — copy on the VPS, do not push to GitHub
-/public/products/*
-!/public/products/placeholders/
+# Original Drive PNGs (~720MB). Compressed JPEGs (front-flat first) are tracked.
+/public/products/**/*.png
 

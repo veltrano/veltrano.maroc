@@ -30,12 +30,13 @@ RUN apk add --no-cache su-exec \
   && adduser -S nextjs -u 1001 -G nodejs
 
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/public/products /opt/veltrano-catalog
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod 755 /app/docker-entrypoint.sh \
   && mkdir -p /app/data/store /app/public/products \
-  && chown -R nextjs:nodejs /app/data /app/public
+  && chown -R nextjs:nodejs /app/data /app/public /opt/veltrano-catalog
 
 EXPOSE 3000
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

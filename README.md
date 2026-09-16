@@ -23,7 +23,7 @@ Cibles : domaine **https://veltrano.ma** (et www), repo **https://github.com/vel
 1. App EasyPanel from GitHub, builder **Dockerfile** (racine).
 2. Port conteneur **3000** (`PORT` / `HOST` EasyPanel → `HOSTNAME` dans l’entrypoint).
 3. Volume persistant : `/app/data/store` + env `DATA_DIR=/app/data/store` (JSON commandes / coupons / file WhatsApp).
-4. Volume photos optionnel : `/app/public/products` (~720 MB, pas dans git).
+4. **Ne monte pas de volume sur `/app/public/products`.** Les JPEG boutique (~33MB, `01.jpg` = plat face avant) sont dans l’image Docker. Un volume vide masquerait toutes les photos. Volume persistant uniquement pour `/app/data/store`.
 5. Env à coller depuis `.env.example` :
    - `NEXT_PUBLIC_SITE_URL=https://veltrano.ma`
    - `SITE_URL=https://veltrano.ma`
@@ -36,7 +36,7 @@ Le CORS des routes `/api` n’accepte que veltrano.ma, www, et le preview local.
 
 `docker compose up --build` en local utilise le volume `veltrano-orders`.
 
-Lifestyle + films clients sont dans git (`public/lifestyle`, `public/videos`).
+Lifestyle + films clients sont dans git (`public/lifestyle`, `public/videos`). Photos produit : JPEG compressés (`01.jpg` = plat **face avant**), les PNG Drive restent hors git.
 
 ## Photos produit
 
