@@ -8,7 +8,9 @@ const map = imageMap as ImageMap;
 export function productImages(product: Product): string[] {
   const files = map[product.slug];
   if (files && files.length > 0) {
-    return files.map((file) => `/products/${product.slug}/${file}`);
+    return files.map(
+      (file) => `/products/${product.slug}/${encodeURIComponent(file)}`
+    );
   }
   return [`/products/placeholders/${product.slug}.svg`];
 }

@@ -11,10 +11,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const INGEST =
   process.env.VELTRANO_INGEST ||
-  "/home/ubuntu/.cursor/projects/workspace/agent-transcripts/media/products";
+  "/cursor/stores/bc-1db07960-8bb0-472e-88b5-80702cb7d755/media/products";
 const MANIFEST =
   process.env.VELTRANO_MANIFEST ||
-  "/home/ubuntu/.cursor/projects/workspace/agent-transcripts/docs/product-image-manifest.md";
+  "/cursor/stores/bc-1db07960-8bb0-472e-88b5-80702cb7d755/docs/product-image-manifest.md";
 const DEST = path.join(__dirname, "..", "public", "products");
 const MAP = path.join(__dirname, "..", "src", "data", "image-map.json");
 
