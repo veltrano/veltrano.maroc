@@ -18,15 +18,13 @@ Build de prod : `npm run build` puis `npm start`.
 
 ## Photos produit
 
-Un worker séparé télécharge les dossiers Google Drive vers un manifeste d’ingest. Ne pas écrire dans ce dossier.
-
-Cette app copie **depuis** l’ingest vers `public/products/<slug>/` :
+Les photos Drive (116 fichiers, 12 modèles) se copient ainsi :
 
 ```bash
 npm run sync-images
 ```
 
-Sans photos, chaque fiche affiche un placeholder teinté + le badge « Photo à venir ».
+Sans photos, chaque fiche affiche un placeholder teinté.
 
 ## Parcours
 

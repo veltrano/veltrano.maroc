@@ -42,3 +42,10 @@ next-env.d.ts
 
 # local fetch scratch
 /agent-tools/
+
+# Drive product photos are copied locally (too large for git)
+/public/products/**/*.png
+/public/products/**/*.jpg
+/public/products/**/*.jpeg
+/public/products/**/*.webp
+
