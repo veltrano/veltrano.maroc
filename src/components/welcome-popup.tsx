@@ -10,22 +10,26 @@ import {
 } from "@/components/ui/dialog";
 import { EmailCapture } from "@/components/email-capture";
 
-const SESSION_KEY = "veltrano:welcome-popup";
+const DISMISSED_KEY = "veltrano:welcome-popup-dismissed";
+const DELAY_MS = 5000;
 
 export function WelcomePopup() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "shown") return;
-    const t = window.setTimeout(() => {
-      setOpen(true);
-      sessionStorage.setItem(SESSION_KEY, "shown");
-    }, 5000);
+    if (sessionStorage.getItem(DISMISSED_KEY) === "1") return;
+    const wait = Math.max(0, DELAY_MS - performance.now());
+    const t = window.setTimeout(() => setOpen(true), wait);
     return () => window.clearTimeout(t);
   }, []);
 
+  function onOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) sessionStorage.setItem(DISMISSED_KEY, "1");
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-white sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl">
