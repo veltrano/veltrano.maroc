@@ -49,7 +49,7 @@
 }
 
 :root {
-  --background: oklch(0.965 0.012 85);
+  --background: #ffffff;
   --foreground: oklch(0.22 0.02 60);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -121,11 +121,13 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
-    @apply font-sans;
+    @apply font-sans bg-white;
+    background-color: #ffffff;
+  }
+  body {
+    @apply bg-white text-foreground;
+    background-color: #ffffff;
   }
   .font-heading {
     font-family: var(--font-heading);
