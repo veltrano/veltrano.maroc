@@ -1,6 +1,8 @@
 # Veltrano
 
-Boutique jeans (baggy et straight fit) calée sur le catalogue officiel : 12 modèles, **250 MAD** l’unité, **400 MAD** le pack de 2.
+Boutique jeans (baggy et straight fit), **français + arabe** : 12 modèles, **250 MAD** l’unité, **400 MAD** le pack de 2.
+
+Sélecteur **FR | ع** à côté du panier. Langue auto (`ar*` → arabe, sinon français). L’arabe est RTL. Veltrano, MAD/DH et noms catalogue inchangés.
 
 Les descriptions du catalogue sont vides — l’app n’invente pas de copy produit au-delà des champs fournis (nom, prix, pack, couleur, tailles, stock, dossier Drive).
 

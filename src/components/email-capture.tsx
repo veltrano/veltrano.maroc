@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { saveEmail } from "@/lib/emails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function EmailCapture({
   idPrefix = "email",
@@ -14,13 +15,14 @@ export function EmailCapture({
 }) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const { t } = useI18n();
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const email = String(data.get("email") ?? "").trim();
     if (!email.includes("@")) {
-      setError("Entre une adresse email valide.");
+      setError(t("email.invalid"));
       return;
     }
     saveEmail(email);
@@ -29,11 +31,7 @@ export function EmailCapture({
   }
 
   if (done) {
-    return (
-      <p className="text-sm">
-        Merci. Ton −10% sur la première commande est enregistré.
-      </p>
-    );
+    return <p className="text-sm">{t("email.thanks")}</p>;
   }
 
   return (
@@ -43,12 +41,12 @@ export function EmailCapture({
         name="email"
         type="email"
         required
-        placeholder="ton@email.com"
+        placeholder={t("email.placeholder")}
         className="h-10 bg-white"
-        aria-label="Email"
+        aria-label={t("email.label")}
       />
       <Button type="submit" size="lg">
-        Recevoir −10%
+        {t("email.submit")}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </form>

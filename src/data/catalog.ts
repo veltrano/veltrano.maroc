@@ -133,10 +133,10 @@ export function fitLabel(fit: Fit) {
   return fit === "baggy" ? "Baggy" : "Coupe droite";
 }
 
-export const FITS: { id: Fit | "all"; label: string }[] = [
-  { id: "all", label: "Toutes les coupes" },
-  { id: "baggy", label: "Baggy" },
-  { id: "straight", label: "Coupe droite" },
+export const FITS: { id: Fit | "all"; labelKey: "fit.all" | "fit.baggy" | "fit.straight" }[] = [
+  { id: "all", labelKey: "fit.all" },
+  { id: "baggy", labelKey: "fit.baggy" },
+  { id: "straight", labelKey: "fit.straight" },
 ];
 
 export function productBySlug(slug: string) {

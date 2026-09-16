@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { displayName, fitLabel, mad, type Product } from "@/data/catalog";
+import { displayName, mad, type Product } from "@/data/catalog";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useI18n } from "@/lib/i18n/provider";
+import { t as translate } from "@/lib/i18n/translate";
 
 export function ProductCard({
   product,
@@ -18,8 +20,10 @@ export function ProductCard({
   const image = productImages(product)[0];
   const live = hasCatalogPhotos(product.slug);
   const { add } = useCart();
+  const { t, locale } = useI18n();
   const [added, setAdded] = useState(false);
   const size = product.sizes[2] ?? product.sizes[0];
+  const fit = translate(locale, product.fit === "baggy" ? "fit.baggy" : "fit.straight");
 
   return (
     <div className="group">
@@ -32,16 +36,16 @@ export function ProductCard({
             className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
           />
           {!live ? (
-            <Badge className="absolute left-3 top-3 bg-background/90 text-foreground">
-              Photo à venir
+            <Badge className="absolute start-3 top-3 bg-background/90 text-foreground">
+              {t("product.photoSoon")}
             </Badge>
           ) : null}
         </div>
         <div className="mt-3 space-y-1">
-          <p className="text-sm text-muted-foreground">{fitLabel(product.fit)}</p>
+          <p className="text-sm text-muted-foreground">{fit}</p>
           <h3 className="font-heading text-lg capitalize leading-tight">{product.colour}</h3>
           <p className="text-sm">
-            {mad(product.unitPriceMad)} · pack 2 {mad(product.duoPriceMad)}
+            {mad(product.unitPriceMad)} · {t("product.pack2short", { price: mad(product.duoPriceMad) })}
           </p>
         </div>
       </Link>
@@ -55,7 +59,7 @@ export function ProductCard({
             setAdded(true);
           }}
         >
-          {added ? "Ajouté" : "Ajouter au panier"}
+          {added ? t("product.addedShort") : t("product.add")}
         </Button>
       ) : null}
     </div>

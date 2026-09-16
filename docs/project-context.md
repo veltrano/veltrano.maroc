@@ -6,7 +6,7 @@ A Veltrano shop that **markets like ALB London** (Home / Boutique / Category) ra
 
 ## Constraints
 
-- Nav: Accueil, Boutique, Catégorie → Homme, Femme.
+- Nav: Accueil / الرئيسية, Boutique / المتجر, Catégorie → Homme / رجال, Femme / نساء.
 - Homme = current men’s jeans. Femme = bientôt + email for −10% on first purchase.
 - Popup: everyone, 5 seconds after entering the site (not on `/admin`).
 - Home: no fixed product count (“douze jeans”); only 4 products + Boutique CTA; lifestyle refs + client videos.
@@ -27,11 +27,12 @@ Copy `.env.example`. None are required for checkout to succeed.
 - Meta Cloud API (preferred when present): `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, optional `WHATSAPP_GRAPH_VERSION` (default `v22.0`).
 - Twilio fallback: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (e.g. `whatsapp:+14155238886`).
 
-Without Meta or Twilio credentials, the French recap (`Hello M. {name}` + order + 48h) is written to `data/store/whatsapp-queue.json`. Thank-you does **not** say WhatsApp was sent.
+Without Meta or Twilio credentials, the recap (French or Arabic from the order locale) is written to `data/store/whatsapp-queue.json`. Thank-you does **not** say WhatsApp was sent.
 
 ## Decisions
 
-- Next.js 15, French UI, localStorage cart/coupons; **orders persist in `data/store/orders.json`**.
+- Next.js 15, **French + Arabic** shopper UI (RTL for `ar`), localStorage cart/coupons; **orders persist in `data/store/orders.json`**.
+- Language: `FR | ع` control next to the cart icon. Auto from `navigator.language` / `Accept-Language` (`ar*` → Arabic, otherwise French). An explicit switch is stored in cookie `veltrano-locale` + `veltrano-locale-choice` and `localStorage` so it does not fight the user. Veltrano, MAD/DH, and catalogue product names stay as-is.
 - Featured Home SKUs: baggy noir, bleu blith, straight stone, baggy dorty.
 - Image order: scored by white-background / flat-lay vs model shots (`src/data/image-map.json`).
 - Coupons: `VT50-XXXXXX`, 50 DH, one-time, apply in cart/checkout. Issued on each order for the *next* purchase (server + local cache).

@@ -125,6 +125,10 @@
     @apply font-sans bg-white;
     background-color: #ffffff;
   }
+  html[lang="ar"] {
+    --font-sans: var(--font-arabic), var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-arabic), var(--font-fraunces), ui-serif, Georgia, serif;
+  }
   body {
     @apply bg-white text-foreground;
     background-color: #ffffff;

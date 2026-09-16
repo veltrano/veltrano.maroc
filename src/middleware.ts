@@ -1,19 +1,34 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { corsHeaders } from "@/lib/site";
+import {
+  COOKIE_LOCALE,
+  LOCALE_HEADER,
+  localeFromAcceptLanguage,
+  parseLocale,
+} from "@/lib/i18n/locale";
 
 export function middleware(req: NextRequest) {
   const origin = req.headers.get("origin");
   const cors = corsHeaders(origin);
 
-  if (req.method === "OPTIONS") {
+  if (req.method === "OPTIONS" && req.nextUrl.pathname.startsWith("/api")) {
     return new NextResponse(null, { status: 204, headers: cors });
   }
 
+  const cookieLocale = parseLocale(req.cookies.get(COOKIE_LOCALE)?.value);
+  const locale =
+    cookieLocale ?? localeFromAcceptLanguage(req.headers.get("accept-language"));
+
   const res = NextResponse.next();
-  cors.forEach((value, key) => res.headers.set(key, value));
+  res.headers.set(LOCALE_HEADER, locale);
+  if (req.nextUrl.pathname.startsWith("/api")) {
+    cors.forEach((value, key) => res.headers.set(key, value));
+  }
   return res;
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|ico|woff2?)$).*)",
+  ],
 };

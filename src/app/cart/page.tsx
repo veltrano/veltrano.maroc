@@ -19,9 +19,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function CartPage() {
   const { lines, setQty, remove } = useCart();
+  const { t } = useI18n();
   const [couponInput, setCouponInput] = useState("");
   const [applied, setApplied] = useState<string | null>(null);
   const [couponMsg, setCouponMsg] = useState("");
@@ -29,6 +31,7 @@ export default function CartPage() {
   const subtotal = cartSubtotal(lines);
   const discount = cartDiscount(lines, applied);
   const total = cartTotal(lines, applied);
+  const units = cartUnitCount(lines);
 
   useEffect(() => {
     const code = getAppliedCode();
@@ -50,7 +53,7 @@ export default function CartPage() {
     const result = await applyCouponRemote(couponInput);
     if (result.ok) {
       setApplied(result.code);
-      setCouponMsg(`Code ${result.code} : −${mad(50)}`);
+      setCouponMsg(t("cart.couponOk", { code: result.code, amount: mad(50) }));
     } else {
       setCouponMsg(result.error);
     }
@@ -59,12 +62,10 @@ export default function CartPage() {
   if (empty) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="font-heading text-3xl">Panier vide</h1>
-        <p className="mt-3 text-muted-foreground">
-          Ajoute un jean baggy ou coupe droite pour commencer une commande.
-        </p>
+        <h1 className="font-heading text-3xl">{t("cart.emptyTitle")}</h1>
+        <p className="mt-3 text-muted-foreground">{t("cart.emptyLead")}</p>
         <Link href="/boutique" className={cn(buttonVariants(), "mt-6 inline-flex")}>
-          Voir la boutique
+          {t("home.seeShop")}
         </Link>
       </div>
     );
@@ -72,9 +73,9 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="font-heading text-3xl">Panier</h1>
+      <h1 className="font-heading text-3xl">{t("cart.title")}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {cartUnitCount(lines)} jean{cartUnitCount(lines) > 1 ? "s" : ""}
+        {t(units > 1 ? "cart.unitsPlural" : "cart.units", { n: units })}
       </p>
       <ul className="mt-8 space-y-6">
         {lines.map((line) => {
@@ -92,7 +93,7 @@ export default function CartPage() {
               <div className="min-w-0 flex-1">
                 <p className="font-heading capitalize">{displayName(product)}</p>
                 <p className="text-sm text-muted-foreground">
-                  {line.pack === "duo" ? "Pack de 2" : "1 jean"} · taille{" "}
+                  {line.pack === "duo" ? t("product.pack2") : t("product.oneJean")} · {t("cart.size")}{" "}
                   {line.pack === "duo" ? `${line.size} + ${line.sizeB}` : line.size}
                 </p>
                 <div className="mt-3 flex items-center gap-3">
@@ -113,15 +114,15 @@ export default function CartPage() {
                   </Button>
                   <button
                     type="button"
-                    className="ml-2 text-sm underline"
+                    className="ms-2 text-sm underline"
                     onClick={() => remove(line.id)}
                   >
-                    Retirer
+                    {t("cart.remove")}
                   </button>
                 </div>
               </div>
-              <div className="text-right text-sm">
-                <div>{lineUnitCount(line)} pce</div>
+              <div className="text-end text-sm">
+                <div>{t("cart.pcs", { n: lineUnitCount(line) })}</div>
                 <div className="font-medium">{mad(linePrice(line))}</div>
               </div>
             </li>
@@ -129,7 +130,7 @@ export default function CartPage() {
         })}
       </ul>
       <form className="mt-8 max-w-sm space-y-2" onSubmit={onCoupon}>
-        <Label htmlFor="cart-coupon">Code promo (50 DH)</Label>
+        <Label htmlFor="cart-coupon">{t("cart.coupon")}</Label>
         <div className="flex gap-2">
           <Input
             id="cart-coupon"
@@ -139,7 +140,7 @@ export default function CartPage() {
             placeholder="VT50-…"
           />
           <Button type="submit" variant="outline">
-            Appliquer
+            {t("cart.apply")}
           </Button>
         </div>
         {couponMsg ? <p className="text-sm text-muted-foreground">{couponMsg}</p> : null}
@@ -153,18 +154,18 @@ export default function CartPage() {
               setCouponMsg("");
             }}
           >
-            Retirer
+            {t("cart.remove")}
           </button>
         ) : null}
       </form>
       <div className="mt-8 flex flex-col items-end gap-2">
-        <p className="text-sm text-muted-foreground">Sous-total {mad(subtotal)}</p>
-        {discount > 0 ? <p className="text-sm">Coupon −{mad(discount)}</p> : null}
+        <p className="text-sm text-muted-foreground">{t("cart.subtotal", { amount: mad(subtotal) })}</p>
+        {discount > 0 ? <p className="text-sm">{t("cart.couponLine", { amount: mad(discount) })}</p> : null}
         <p className="text-lg">
-          Total <span className="font-medium">{mad(total)}</span>
+          {t("cart.total")} <span className="font-medium">{mad(total)}</span>
         </p>
         <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "inline-flex")}>
-          Continuer vers la commande
+          {t("cart.checkout")}
         </Link>
       </div>
     </div>

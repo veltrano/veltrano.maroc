@@ -11,24 +11,25 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { LanguageSwitch } from "@/components/language-switch";
 import { cartUnitCount, useCart } from "@/lib/cart";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
-
-const topLinks = [
-  { href: "/", label: "Accueil" },
-  { href: "/boutique", label: "Boutique" },
-];
-
-const categories = [
-  { href: "/homme", label: "Homme" },
-  { href: "/femme", label: "Femme" },
-];
 
 export function SiteHeader() {
   const pathname = usePathname();
   const { lines } = useCart();
+  const { t, locale } = useI18n();
   const count = cartUnitCount(lines);
   const categoryActive = pathname === "/homme" || pathname === "/femme";
+  const topLinks = [
+    { href: "/", label: t("nav.home") },
+    { href: "/boutique", label: t("nav.shop") },
+  ];
+  const categories = [
+    { href: "/homme", label: t("nav.men") },
+    { href: "/femme", label: t("nav.women") },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-white">
@@ -61,10 +62,10 @@ export function SiteHeader() {
               )}
               aria-haspopup="true"
             >
-              Catégorie
+              {t("nav.category")}
               <ChevronDown className="size-3.5" />
             </button>
-            <div className="invisible absolute left-0 top-full z-50 min-w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+            <div className="invisible absolute start-0 top-full z-50 min-w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
               <div className="rounded-xl border border-border bg-white py-2 shadow-md">
                 {categories.map((c) => (
                   <Link
@@ -80,14 +81,15 @@ export function SiteHeader() {
           </div>
         </nav>
         <div className="flex items-center gap-2">
+          <LanguageSwitch />
           <Link
             href="/cart"
-            aria-label="Panier"
+            aria-label={t("nav.cart")}
             className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative")}
           >
             <ShoppingBag className="size-4" />
             {count > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground">
+              <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground">
                 {count}
               </span>
             ) : null}
@@ -98,11 +100,11 @@ export function SiteHeader() {
                 buttonVariants({ variant: "ghost", size: "icon" }),
                 "md:hidden"
               )}
-              aria-label="Menu"
+              aria-label={t("nav.menu")}
             >
               <Menu className="size-4" />
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent side={locale === "ar" ? "left" : "right"}>
               <SheetHeader>
                 <SheetTitle>Veltrano</SheetTitle>
               </SheetHeader>
@@ -113,7 +115,7 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <p className="pt-2 text-xs uppercase tracking-widest text-muted-foreground">
-                  Catégorie
+                  {t("nav.category")}
                 </p>
                 {categories.map((c) => (
                   <Link key={c.href} href={c.href} className="text-lg">

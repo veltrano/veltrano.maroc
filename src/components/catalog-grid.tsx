@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import { FITS, PRODUCTS, type Fit } from "@/data/catalog";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n/provider";
 
 const colours = ["all", ...Array.from(new Set(PRODUCTS.map((p) => p.colour)))];
 
 export function CatalogGrid() {
   const [fit, setFit] = useState<Fit | "all">("all");
   const [colour, setColour] = useState("all");
+  const { t } = useI18n();
 
   const items = useMemo(() => {
     return PRODUCTS.filter((p) => {
@@ -31,20 +33,20 @@ export function CatalogGrid() {
               variant={fit === f.id ? "default" : "outline"}
               onClick={() => setFit(f.id)}
             >
-              {f.label}
+              {t(f.labelKey)}
             </Button>
           ))}
         </div>
         <label className="text-sm text-muted-foreground">
-          Couleur
+          {t("filter.colour")}
           <select
-            className="ml-2 rounded-lg border border-border bg-white px-3 py-2 text-foreground capitalize"
+            className="ms-2 rounded-lg border border-border bg-white px-3 py-2 text-foreground capitalize"
             value={colour}
             onChange={(e) => setColour(e.target.value)}
           >
             {colours.map((c) => (
               <option key={c} value={c}>
-                {c === "all" ? "Toutes" : c}
+                {c === "all" ? t("filter.allColours") : c}
               </option>
             ))}
           </select>
@@ -52,9 +54,7 @@ export function CatalogGrid() {
       </div>
 
       {items.length === 0 ? (
-        <div className="py-20 text-center text-muted-foreground">
-          Aucun jean pour ce filtre. Réinitialise la coupe ou la couleur.
-        </div>
+        <div className="py-20 text-center text-muted-foreground">{t("filter.empty")}</div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
           {items.map((p) => (

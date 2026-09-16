@@ -34,7 +34,7 @@ export function allowedOrigins() {
 export function corsHeaders(origin: string | null) {
   const headers = new Headers();
   headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  headers.set("Access-Control-Allow-Headers", "Content-Type, x-admin-secret");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, x-admin-secret, Accept-Language");
   headers.set("Access-Control-Max-Age", "86400");
   if (origin && allowedOrigins().has(origin.replace(/\/$/, ""))) {
     headers.set("Access-Control-Allow-Origin", origin);

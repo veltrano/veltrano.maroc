@@ -10,12 +10,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmailCapture } from "@/components/email-capture";
+import { useI18n } from "@/lib/i18n/provider";
 
 const DISMISSED_KEY = "veltrano:welcome-popup-dismissed";
 const DELAY_MS = 5000;
 
 export function WelcomePopup() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const disabled = pathname.startsWith("/admin");
 
@@ -38,13 +40,8 @@ export function WelcomePopup() {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">
-            −10% sur ta première commande
-          </DialogTitle>
-          <DialogDescription>
-            Laisse ton email. On t’écrit dès que les nouveautés arrivent — Homme
-            maintenant, Femme très bientôt.
-          </DialogDescription>
+          <DialogTitle className="font-heading text-2xl">{t("popup.title")}</DialogTitle>
+          <DialogDescription>{t("popup.body")}</DialogDescription>
         </DialogHeader>
         <EmailCapture idPrefix="popup" />
       </DialogContent>

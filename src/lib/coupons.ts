@@ -120,7 +120,12 @@ export async function applyCouponRemote(raw: string) {
   const code = raw.trim().toUpperCase();
   if (!code) return { ok: false as const, error: COUPON_EMPTY };
   try {
-    const res = await fetch(`/api/coupons/${encodeURIComponent(code)}`);
+    const res = await fetch(`/api/coupons/${encodeURIComponent(code)}`, {
+      headers: {
+        "Accept-Language":
+          typeof document !== "undefined" ? document.documentElement.lang || "fr" : "fr",
+      },
+    });
     const json = (await res.json()) as {
       ok?: boolean;
       code?: string;

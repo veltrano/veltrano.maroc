@@ -1,15 +1,14 @@
 import { CatalogGrid } from "@/components/catalog-grid";
+import { getT } from "@/lib/i18n/server";
 
-export default function HommePage() {
+export default async function HommePage() {
+  const { t } = await getT();
   return (
     <div className="bg-white">
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Catégorie</p>
-        <h1 className="font-heading mt-2 text-4xl">Homme</h1>
-        <p className="mt-3 max-w-xl text-muted-foreground">
-          Les jeans Veltrano disponibles aujourd’hui — baggy et coupe droite. Tailles et
-          packs sur chaque fiche.
-        </p>
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{t("men.kicker")}</p>
+        <h1 className="font-heading mt-2 text-4xl">{t("men.title")}</h1>
+        <p className="mt-3 max-w-xl text-muted-foreground">{t("men.lead")}</p>
         <div className="mt-10">
           <CatalogGrid />
         </div>

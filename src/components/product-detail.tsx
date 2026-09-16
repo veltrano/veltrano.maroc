@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { displayName, fitLabel, mad, packPrice, type Product } from "@/data/catalog";
+import { displayName, mad, packPrice, type Product } from "@/data/catalog";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/lib/i18n/provider";
+import { t as translate } from "@/lib/i18n/translate";
 
 export function ProductDetail({ product }: { product: Product }) {
   const images = productImages(product);
@@ -20,6 +22,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const { add } = useCart();
   const router = useRouter();
+  const { t, locale } = useI18n();
+  const fit = translate(locale, product.fit === "baggy" ? "fit.baggy" : "fit.straight");
 
   const units = pack === "duo" ? qty * 2 : qty;
   const total = packPrice(units);
@@ -54,8 +58,8 @@ export function ProductDetail({ product }: { product: Product }) {
             className="h-full w-full object-contain"
           />
           {!live ? (
-            <Badge className="absolute left-4 top-4 bg-background/90 text-foreground">
-              Photo Drive en attente
+            <Badge className="absolute start-4 top-4 bg-background/90 text-foreground">
+              {t("product.photoDrive")}
             </Badge>
           ) : null}
         </div>
@@ -80,54 +84,58 @@ export function ProductDetail({ product }: { product: Product }) {
 
       <div className="space-y-6">
         <div>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">
-            {fitLabel(product.fit)}
-          </p>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">{fit}</p>
           <h1 className="font-heading mt-1 text-4xl capitalize">{product.colour}</h1>
           <p className="mt-3 text-lg">
-            {mad(product.unitPriceMad)} l’unité · {mad(product.duoPriceMad)} le pack de 2
+            {t("product.packPrice", {
+              unit: mad(product.unitPriceMad),
+              duo: mad(product.duoPriceMad),
+            })}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">{product.stock} pièces en stock</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("product.stock", { n: product.stock })}</p>
         </div>
 
         {product.description ? (
           <p className="text-muted-foreground">{product.description}</p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Jean {fitLabel(product.fit).toLowerCase()} teinte {product.colour}. Tailles{" "}
-            {product.sizes[0]} à {product.sizes[product.sizes.length - 1]}. Description
-            catalogue vide — on affiche uniquement les champs officiels.
+            {t("product.fallback", {
+              fit,
+              colour: product.colour,
+              from: product.sizes[0],
+              to: product.sizes[product.sizes.length - 1],
+            })}
           </p>
         )}
 
         <div className="space-y-2">
-          <Label>Pack</Label>
+          <Label>{t("product.pack")}</Label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setPack("single")}
-              className={`rounded-xl border px-4 py-3 text-left ${
+              className={`rounded-xl border px-4 py-3 text-start ${
                 pack === "single" ? "border-foreground bg-white" : "border-border"
               }`}
             >
-              <div className="font-medium">1 jean</div>
+              <div className="font-medium">{t("product.oneJean")}</div>
               <div className="text-sm text-muted-foreground">{mad(250)}</div>
             </button>
             <button
               type="button"
               onClick={() => setPack("duo")}
-              className={`rounded-xl border px-4 py-3 text-left ${
+              className={`rounded-xl border px-4 py-3 text-start ${
                 pack === "duo" ? "border-foreground bg-white" : "border-border"
               }`}
             >
-              <div className="font-medium">Pack de 2</div>
+              <div className="font-medium">{t("product.pack2")}</div>
               <div className="text-sm text-muted-foreground">{mad(400)}</div>
             </button>
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label>Taille{pack === "duo" ? " 1" : ""}</Label>
+          <Label>{pack === "duo" ? t("product.size1") : t("product.size")}</Label>
           <div className="flex flex-wrap gap-2">
             {product.sizes.map((s) => (
               <button
@@ -146,7 +154,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
         {pack === "duo" ? (
           <div className="space-y-2">
-            <Label>Taille 2</Label>
+            <Label>{t("product.size2")}</Label>
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((s) => (
                 <button
@@ -167,7 +175,7 @@ export function ProductDetail({ product }: { product: Product }) {
         ) : null}
 
         <div className="space-y-2">
-          <Label>Quantité de packs</Label>
+          <Label>{t("product.qtyPacks")}</Label>
           <div className="flex items-center gap-3">
             <Button
               type="button"
@@ -187,23 +195,21 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="rounded-xl bg-white p-4 text-sm">
           <div className="flex justify-between">
             <span>
-              {units} jean{units > 1 ? "s" : ""} · taille {sizeLabel}
+              {t(units > 1 ? "product.summaryPlural" : "product.summary", {
+                n: units,
+                size: sizeLabel,
+              })}
             </span>
             <span className="font-medium">{mad(total)}</span>
           </div>
         </div>
 
-        {soldOut ? (
-          <p className="text-sm text-destructive">Rupture de stock.</p>
-        ) : null}
-
-        {added ? (
-          <p className="text-sm text-foreground">Ajouté au panier.</p>
-        ) : null}
+        {soldOut ? <p className="text-sm text-destructive">{t("product.soldOut")}</p> : null}
+        {added ? <p className="text-sm text-foreground">{t("product.added")}</p> : null}
 
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button size="lg" className="flex-1" disabled={soldOut} onClick={() => onAdd(false)}>
-            Ajouter au panier
+            {t("product.add")}
           </Button>
           <Button
             size="lg"
@@ -212,7 +218,7 @@ export function ProductDetail({ product }: { product: Product }) {
             disabled={soldOut}
             onClick={() => onAdd(true)}
           >
-            Commander
+            {t("product.order")}
           </Button>
         </div>
       </div>

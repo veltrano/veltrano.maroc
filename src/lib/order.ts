@@ -32,6 +32,7 @@ export type Order = {
   appliedCoupon?: string;
   rewardCoupon: string;
   whatsapp: WhatsAppDelivery;
+  locale?: "fr" | "ar";
 };
 
 export type WhatsAppQueueItem = {
@@ -68,23 +69,25 @@ export function cartUnitCount(lines: CartLine[]) {
   return lines.reduce((sum, line) => sum + lineUnitCount(line), 0);
 }
 
-export function sanitizeLines(raw: CartLine[]): CartLine[] | { error: string } {
+export function sanitizeLines(
+  raw: CartLine[]
+): CartLine[] | { error: string; errorKey?: string; slug?: string } {
   if (!Array.isArray(raw) || raw.length === 0) {
-    return { error: "Le panier est vide." };
+    return { error: "Le panier est vide.", errorKey: "checkout.emptyCart" };
   }
   const lines: CartLine[] = [];
   for (const row of raw) {
     const product = productBySlug(row.slug);
-    if (!product) return { error: `Modèle inconnu : ${row.slug}.` };
+    if (!product) return { error: `Modèle inconnu : ${row.slug}.`, errorKey: "err.unknownSku", slug: row.slug };
     if (row.pack !== "single" && row.pack !== "duo") {
-      return { error: "Pack invalide." };
+      return { error: "Pack invalide.", errorKey: "err.invalidPack" };
     }
     const qty = Number(row.quantity);
-    if (!Number.isFinite(qty) || qty < 1) return { error: "Quantité invalide." };
-    if (!product.sizes.includes(row.size)) return { error: "Taille invalide." };
+    if (!Number.isFinite(qty) || qty < 1) return { error: "Quantité invalide.", errorKey: "err.invalidQty" };
+    if (!product.sizes.includes(row.size)) return { error: "Taille invalide.", errorKey: "err.invalidSize" };
     if (row.pack === "duo") {
       if (!row.sizeB || !product.sizes.includes(row.sizeB)) {
-        return { error: "Deuxième taille invalide." };
+        return { error: "Deuxième taille invalide.", errorKey: "err.invalidSizeB" };
       }
     }
     lines.push({

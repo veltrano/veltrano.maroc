@@ -1,34 +1,38 @@
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n/provider";
+import { mad } from "@/data/catalog";
 
 export function SiteFooter() {
+  const { t } = useI18n();
   return (
     <footer className="mt-16 border-t border-border bg-white">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm sm:grid-cols-3 sm:px-6">
         <div>
           <p className="font-heading text-lg text-foreground">Veltrano</p>
           <p className="mt-2 text-muted-foreground">
-            Denim pensé pour être porté — et remarqué. {`250 MAD`} le jean, {`400 MAD`}{" "}
-            le pack de 2.
+            {t("footer.blurb", { unit: mad(250), duo: mad(400) })}
           </p>
         </div>
         <div className="flex flex-col gap-2">
           <Link href="/" className="hover:text-foreground">
-            Accueil
+            {t("nav.home")}
           </Link>
           <Link href="/boutique" className="hover:text-foreground">
-            Boutique
+            {t("nav.shop")}
           </Link>
           <Link href="/homme" className="hover:text-foreground">
-            Homme
+            {t("nav.men")}
           </Link>
           <Link href="/femme" className="hover:text-foreground">
-            Femme
+            {t("nav.women")}
           </Link>
         </div>
         <div className="text-muted-foreground">
-          <p>Livraison Maroc</p>
-          <p>Échanges simples par message</p>
-          <p>Nouveautés en continu — pas une collection figée</p>
+          <p>{t("footer.delivery")}</p>
+          <p>{t("footer.exchanges")}</p>
+          <p>{t("footer.news")}</p>
         </div>
       </div>
     </footer>
