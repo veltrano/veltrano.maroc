@@ -1,10 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { mad } from "@/data/catalog";
-import { cartTotal, cartUnitCount, useCart } from "@/lib/cart";
+import { cartDiscount, cartSubtotal, cartTotal, cartUnitCount, useCart } from "@/lib/cart";
+import { applyCouponInput, getAppliedCode, setAppliedCode } from "@/lib/coupons";
+import { customerWhatsAppUrl } from "@/lib/whatsapp";
+import { orderWhatsAppMessage } from "@/lib/order-message";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -15,7 +18,33 @@ export default function CheckoutPage() {
   const { lines, placeOrder } = useCart();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMsg, setCouponMsg] = useState("");
+  const [applied, setApplied] = useState<string | null>(null);
   const empty = lines.length === 0;
+  const subtotal = cartSubtotal(lines);
+  const discount = cartDiscount(lines, applied);
+  const total = cartTotal(lines, applied);
+
+  useEffect(() => {
+    const code = getAppliedCode();
+    if (code) {
+      setApplied(code);
+      setCouponInput(code);
+    }
+  }, []);
+
+  function onCoupon(e: FormEvent) {
+    e.preventDefault();
+    const result = applyCouponInput(couponInput);
+    if (result.ok) {
+      setApplied(result.code);
+      setCouponMsg(`Code ${result.code} applied (−${mad(50)}).`);
+      setError("");
+    } else {
+      setCouponMsg(result.error);
+    }
+  }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,7 +63,11 @@ export default function CheckoutPage() {
       return;
     }
     const order = placeOrder({ name, phone, city, address, notes });
-    router.push(`/orders/${order.id}`);
+    const wa = customerWhatsAppUrl(order.phone, orderWhatsAppMessage(order));
+    if (wa) {
+      window.open(wa, "_blank", "noopener,noreferrer");
+    }
+    router.push(`/thank-you/${order.id}`);
   }
 
   if (empty) {
@@ -42,7 +75,7 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <h1 className="font-heading text-3xl">Rien à commander</h1>
         <p className="mt-3 text-muted-foreground">Votre panier est vide.</p>
-        <Link href="/" className={cn(buttonVariants(), "mt-6 inline-flex")}>
+        <Link href="/boutique" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Boutique
         </Link>
       </div>
@@ -54,8 +87,8 @@ export default function CheckoutPage() {
       <form className="space-y-4" onSubmit={onSubmit}>
         <h1 className="font-heading text-3xl">Livraison</h1>
         <p className="text-sm text-muted-foreground">
-          Commande enregistrée localement (pas de paiement en ligne sur cette
-          tranche).
+          Après validation, WhatsApp s’ouvre avec le récapitulatif — le message n’est pas
+          envoyé tant que tu ne le valides pas dans WhatsApp.
         </p>
         <div className="space-y-2">
           <Label htmlFor="name">Nom</Label>
@@ -63,7 +96,7 @@ export default function CheckoutPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Téléphone</Label>
-          <Input id="phone" name="phone" required inputMode="tel" className="h-10" />
+          <Input id="phone" name="phone" required inputMode="tel" className="h-10" placeholder="06…" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="city">Ville</Label>
@@ -79,10 +112,10 @@ export default function CheckoutPage() {
         </div>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
         <Button type="submit" size="lg" className="w-full">
-          Confirmer la commande · {mad(cartTotal(lines))}
+          Confirmer la commande · {mad(total)}
         </Button>
       </form>
-      <aside className="h-fit rounded-2xl bg-white p-6">
+      <aside className="h-fit rounded-2xl border border-border bg-white p-6">
         <h2 className="font-heading text-xl">Récapitulatif</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {cartUnitCount(lines)} pièce{cartUnitCount(lines) > 1 ? "s" : ""}
@@ -96,7 +129,48 @@ export default function CheckoutPage() {
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-lg font-medium">{mad(cartTotal(lines))}</p>
+        <form className="mt-6 space-y-2" onSubmit={onCoupon}>
+          <Label htmlFor="coupon">Code promo</Label>
+          <div className="flex gap-2">
+            <Input
+              id="coupon"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+              className="h-10"
+              placeholder="VT50-…"
+            />
+            <Button type="submit" variant="outline">
+              Appliquer
+            </Button>
+          </div>
+          {applied ? (
+            <button
+              type="button"
+              className="text-xs underline"
+              onClick={() => {
+                setAppliedCode(null);
+                setApplied(null);
+                setCouponMsg("");
+              }}
+            >
+              Retirer le code
+            </button>
+          ) : null}
+          {couponMsg ? <p className="text-sm text-muted-foreground">{couponMsg}</p> : null}
+        </form>
+        <div className="mt-6 space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span>Sous-total</span>
+            <span>{mad(subtotal)}</span>
+          </div>
+          {discount > 0 ? (
+            <div className="flex justify-between">
+              <span>Coupon</span>
+              <span>−{mad(discount)}</span>
+            </div>
+          ) : null}
+        </div>
+        <p className="mt-4 text-lg font-medium">{mad(total)}</p>
       </aside>
     </div>
   );

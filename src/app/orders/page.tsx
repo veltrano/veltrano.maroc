@@ -27,7 +27,7 @@ export default function OrdersPage() {
       <ul className="mt-8 space-y-4">
         {orders.map((o) => (
           <li key={o.id} className="rounded-xl border border-border bg-white p-4">
-            <Link href={`/orders/${o.id}`} className="flex items-center justify-between">
+            <Link href={`/thank-you/${o.id}`} className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{o.id}</p>
                 <p className="text-sm text-muted-foreground">

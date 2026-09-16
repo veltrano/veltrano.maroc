@@ -8,6 +8,14 @@ import {
   useSyncExternalStore,
 } from "react";
 import { packPrice, productBySlug, type Product } from "@/data/catalog";
+import {
+  COUPON_VALUE_MAD,
+  getAppliedCode,
+  issueCoupon,
+  markCouponUsed,
+  setAppliedCode,
+  unusedCoupon,
+} from "@/lib/coupons";
 
 export type CartLine = {
   id: string;
@@ -27,7 +35,11 @@ export type Order = {
   address: string;
   notes: string;
   lines: CartLine[];
+  subtotalMad: number;
+  discountMad: number;
   totalMad: number;
+  appliedCoupon?: string;
+  rewardCoupon: string;
 };
 
 const CART_KEY = "veltrano:cart";
@@ -102,8 +114,20 @@ export function linePrice(line: CartLine) {
   return packPrice(lineUnitCount(line));
 }
 
-export function cartTotal(lines: CartLine[]) {
+export function cartSubtotal(lines: CartLine[]) {
   return lines.reduce((sum, line) => sum + linePrice(line), 0);
+}
+
+export function cartDiscount(lines: CartLine[], couponCode?: string | null) {
+  if (!couponCode) return 0;
+  if (typeof window === "undefined") return 0;
+  if (!unusedCoupon(couponCode)) return 0;
+  if (cartSubtotal(lines) <= 0) return 0;
+  return COUPON_VALUE_MAD;
+}
+
+export function cartTotal(lines: CartLine[], couponCode?: string | null) {
+  return Math.max(0, cartSubtotal(lines) - cartDiscount(lines, couponCode));
 }
 
 export function cartUnitCount(lines: CartLine[]) {
@@ -117,7 +141,7 @@ type CartApi = {
   setQty: (id: string, quantity: number) => void;
   remove: (id: string) => void;
   clear: () => void;
-  placeOrder: (info: Omit<Order, "id" | "createdAt" | "lines" | "totalMad">) => Order;
+  placeOrder: (info: Omit<Order, "id" | "createdAt" | "lines" | "subtotalMad" | "discountMad" | "totalMad" | "appliedCoupon" | "rewardCoupon">) => Order;
 };
 
 const CartContext = createContext<CartApi | null>(null);
@@ -172,18 +196,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const placeOrder = useCallback(
-    (info: Omit<Order, "id" | "createdAt" | "lines" | "totalMad">) => {
+    (info: Omit<Order, "id" | "createdAt" | "lines" | "subtotalMad" | "discountMad" | "totalMad" | "appliedCoupon" | "rewardCoupon">) => {
+      const id = `VT-${Date.now().toString(36).toUpperCase()}`;
+      const applied = getAppliedCode();
+      const subtotalMad = cartSubtotal(cart);
+      const discountMad = cartDiscount(cart, applied);
+      if (applied && discountMad > 0) {
+        markCouponUsed(applied, id);
+      }
+      const reward = issueCoupon(id);
       const order: Order = {
         ...info,
-        id: `VT-${Date.now().toString(36).toUpperCase()}`,
+        id,
         createdAt: new Date().toISOString(),
         lines: [...cart],
-        totalMad: cartTotal(cart),
+        subtotalMad,
+        discountMad,
+        totalMad: Math.max(0, subtotalMad - discountMad),
+        appliedCoupon: discountMad > 0 ? applied ?? undefined : undefined,
+        rewardCoupon: reward.code,
       };
       orders = [order, ...orders];
       persistOrders();
       cart = [];
       persistCart();
+      setAppliedCode(null);
+      emitCart();
       return order;
     },
     []

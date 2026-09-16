@@ -46,12 +46,12 @@ export function ProductDetail({ product }: { product: Product }) {
   return (
     <div className="grid gap-10 lg:grid-cols-2">
       <div>
-        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-[#e8e2d8]">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={images[active] ?? images[0]}
             alt={displayName(product)}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
           {!live ? (
             <Badge className="absolute left-4 top-4 bg-background/90 text-foreground">
@@ -71,7 +71,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" className="h-full w-full object-cover" />
+                <img src={src} alt="" className="h-full w-full object-contain bg-white" />
               </button>
             ))}
           </div>
