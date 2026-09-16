@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { mad } from "@/data/catalog";
 import { cartTotal, cartUnitCount, useCart } from "@/lib/cart";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,9 +42,9 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <h1 className="font-heading text-3xl">Rien à commander</h1>
         <p className="mt-3 text-muted-foreground">Votre panier est vide.</p>
-        <Button className="mt-6" render={<Link href="/" />}>
+        <Link href="/" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Boutique
-        </Button>
+        </Link>
       </div>
     );
   }
@@ -58,7 +59,7 @@ export default function CheckoutPage() {
         </p>
         <div className="space-y-2">
           <Label htmlFor="name">Nom</Label>
-          <Input id="name" name="name" required />
+          <Input id="name" name="name" required className="h-10" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Téléphone</Label>

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { displayName, mad } from "@/data/catalog";
 import { linePrice, lineProduct, useCart } from "@/lib/cart";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
@@ -18,9 +19,9 @@ export default function OrderDetailPage() {
         <p className="mt-3 text-muted-foreground">
           Elle n’est pas enregistrée sur cet appareil.
         </p>
-        <Button className="mt-6" render={<Link href="/orders" />}>
+        <Link href="/orders" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Mes commandes
-        </Button>
+        </Link>
       </div>
     );
   }
@@ -49,9 +50,9 @@ export default function OrderDetailPage() {
         })}
       </ul>
       <p className="mt-6 text-lg font-medium">Total {mad(order.totalMad)}</p>
-      <Button className="mt-8" render={<Link href="/" />}>
+      <Link href="/" className={cn(buttonVariants(), "mt-8 inline-flex")}>
         Continuer les achats
-      </Button>
+      </Link>
     </div>
   );
 }

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { mad } from "@/data/catalog";
 import { useCart } from "@/lib/cart";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function OrdersPage() {
   const { orders } = useCart();
@@ -14,9 +15,9 @@ export default function OrdersPage() {
         <p className="mt-3 text-muted-foreground">
           Les commandes de cet appareil apparaîtront ici.
         </p>
-        <Button className="mt-6" render={<Link href="/" />}>
+        <Link href="/" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Boutique
-        </Button>
+        </Link>
       </div>
     );
   }

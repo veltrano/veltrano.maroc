@@ -11,7 +11,8 @@ import {
   useCart,
 } from "@/lib/cart";
 import { productImages } from "@/lib/product-images";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function CartPage() {
   const { lines, setQty, remove } = useCart();
@@ -24,9 +25,9 @@ export default function CartPage() {
         <p className="mt-3 text-muted-foreground">
           Ajoutez un jean baggy ou straight fit pour commencer une commande.
         </p>
-        <Button className="mt-6" render={<Link href="/" />}>
+        <Link href="/" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Voir la boutique
-        </Button>
+        </Link>
       </div>
     );
   }
@@ -93,9 +94,9 @@ export default function CartPage() {
         <p className="text-lg">
           Total <span className="font-medium">{mad(cartTotal(lines))}</span>
         </p>
-        <Button size="lg" render={<Link href="/checkout" />}>
+        <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "inline-flex")}>
           Continuer vers la commande
-        </Button>
+        </Link>
       </div>
     </div>
   );
