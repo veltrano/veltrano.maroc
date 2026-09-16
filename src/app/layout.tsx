@@ -14,9 +14,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Veltrano — jeans baggy & straight fit",
+  title: "Veltrano — denim baggy & straight",
   description:
-    "Boutique Veltrano : 12 jeans, 250 MAD l’unité ou 400 MAD le pack de 2. Tailles et stock du catalogue officiel.",
+    "Veltrano : jeans marocains, baggy et straight. 250 MAD l’unité, 400 MAD le pack de 2. Homme maintenant, Femme bientôt.",
 };
 
 export default function RootLayout({

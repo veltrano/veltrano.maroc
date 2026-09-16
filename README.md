@@ -28,8 +28,10 @@ Sans photos, chaque fiche affiche un placeholder teinté.
 
 ## Parcours
 
+- Home (lifestyle, 4 pièces, films clients), Boutique, Homme, Femme (coming soon)
 - Grille boutique, filtres coupe / couleur
 - Fiche produit : galerie, pack 1 ou 2 (tailles distinctes sur le duo), stock
 - Panier et commande locale (pas de paiement en ligne)
+- Popup email −10%, 5 secondes après l’arrivée
 
 Catalogue source : `src/data/product-catalog.csv` (export de la Google Sheet).

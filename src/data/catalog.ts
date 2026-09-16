@@ -153,3 +153,24 @@ export function packPrice(quantity: number) {
 export function mad(amount: number) {
   return `${amount.toLocaleString("fr-MA")} MAD`;
 }
+
+/** Home “new arrivals” slice — not the full catalogue. */
+export const FEATURED_SLUGS = [
+  "baggy-jean-noir",
+  "baggy-jean-bleu-blith",
+  "straight-fit-jean-stone",
+  "baggy-jean-dorty",
+] as const;
+
+export function featuredProducts() {
+  return FEATURED_SLUGS.map((slug) => productBySlug(slug)).filter(
+    (p): p is Product => Boolean(p)
+  );
+}
+
+export const CLIENT_VIDEOS = [
+  { src: "/videos/jean-baggy-signature.mp4", label: "Le jean baggy signature" },
+  { src: "/videos/ensemble-urbain.mp4", label: "L’ensemble urbain" },
+  { src: "/videos/onsomble-ete.mp4", label: "Look d’été" },
+  { src: "/videos/trois-ensembles.mp4", label: "Chez Veltrano" },
+] as const;

@@ -48,4 +48,6 @@ next-env.d.ts
 /public/products/**/*.jpg
 /public/products/**/*.jpeg
 /public/products/**/*.webp
+/public/lifestyle/**
+/public/videos/**
 
