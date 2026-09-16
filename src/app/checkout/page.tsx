@@ -5,9 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { displayName, mad, productBySlug } from "@/data/catalog";
 import { cartDiscount, cartSubtotal, cartTotal, cartUnitCount, useCart } from "@/lib/cart";
-import { applyCouponInput, getAppliedCode, setAppliedCode } from "@/lib/coupons";
-import { customerWhatsAppUrl } from "@/lib/whatsapp";
-import { orderWhatsAppMessage } from "@/lib/order-message";
+import { applyCouponRemote, getAppliedCode, setAppliedCode, saveIssuedCoupon, markCouponUsed } from "@/lib/coupons";
+import type { Order } from "@/lib/order";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -15,9 +14,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function CheckoutPage() {
-  const { lines, placeOrder } = useCart();
+  const { lines, rememberOrder } = useCart();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [couponMsg, setCouponMsg] = useState("");
   const [applied, setApplied] = useState<string | null>(null);
@@ -34,9 +34,9 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  function onCoupon(e: FormEvent) {
+  async function onCoupon(e: FormEvent) {
     e.preventDefault();
-    const result = applyCouponInput(couponInput);
+    const result = await applyCouponRemote(couponInput);
     if (result.ok) {
       setApplied(result.code);
       setCouponMsg(`Code ${result.code} appliqué (−${mad(50)}).`);
@@ -46,7 +46,7 @@ export default function CheckoutPage() {
     }
   }
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const name = String(data.get("name") ?? "").trim();
@@ -62,12 +62,38 @@ export default function CheckoutPage() {
       setError("Le panier est vide.");
       return;
     }
-    const order = placeOrder({ name, phone, city, address, notes });
-    const wa = customerWhatsAppUrl(order.phone, orderWhatsAppMessage(order));
-    if (wa) {
-      window.open(wa, "_blank", "noopener,noreferrer");
+    setPending(true);
+    setError("");
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          phone,
+          city,
+          address,
+          notes,
+          lines,
+          coupon: applied,
+        }),
+      });
+      const json = (await res.json()) as { order?: Order; error?: string };
+      if (!res.ok || !json.order) {
+        setError(json.error || "Impossible d’enregistrer la commande.");
+        setPending(false);
+        return;
+      }
+      if (applied && json.order.appliedCoupon) {
+        markCouponUsed(applied, json.order.id);
+      }
+      saveIssuedCoupon(json.order.rewardCoupon, json.order.id);
+      rememberOrder(json.order);
+      router.push(`/thank-you/${json.order.id}`);
+    } catch {
+      setError("Impossible d’enregistrer la commande. Réessaie.");
+      setPending(false);
     }
-    router.push(`/thank-you/${order.id}`);
   }
 
   if (empty) {
@@ -87,8 +113,8 @@ export default function CheckoutPage() {
       <form className="space-y-4" onSubmit={onSubmit}>
         <h1 className="font-heading text-3xl">Livraison</h1>
         <p className="text-sm text-muted-foreground">
-          Après validation, WhatsApp s’ouvre avec le récapitulatif — le message n’est pas
-          envoyé tant que tu ne le valides pas dans WhatsApp.
+          Confirmer enregistre la commande tout de suite. L’équipe te contacte ensuite —
+          tu n’as pas besoin d’ouvrir WhatsApp.
         </p>
         <div className="space-y-2">
           <Label htmlFor="name">Nom</Label>
@@ -111,8 +137,8 @@ export default function CheckoutPage() {
           <Textarea id="notes" name="notes" placeholder="Étage, taille de secours…" />
         </div>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <Button type="submit" size="lg" className="w-full">
-          Confirmer la commande · {mad(total)}
+        <Button type="submit" size="lg" className="w-full" disabled={pending}>
+          {pending ? "Enregistrement…" : `Confirmer la commande · ${mad(total)}`}
         </Button>
       </form>
       <aside className="h-fit rounded-2xl border border-border bg-white p-6">

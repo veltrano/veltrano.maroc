@@ -1,6 +1,6 @@
-import type { CartLine, Order } from "@/lib/cart";
+import type { CartLine, Order } from "@/lib/order";
 import { displayName, mad, productBySlug } from "@/data/catalog";
-import { linePrice, lineUnitCount } from "@/lib/cart";
+import { linePrice, lineUnitCount } from "@/lib/order";
 
 export function orderWhatsAppMessage(order: Order) {
   const lines = order.lines
@@ -19,8 +19,10 @@ export function orderWhatsAppMessage(order: Order) {
       ? `\nRéduction : −${mad(order.discountMad)}`
       : "";
 
-  return `Bonjour ${order.name}, merci pour ta commande !
-Merci de confirmer que les informations ci-dessous sont exactes, et de nous indiquer si tu seras disponible sous 48 heures pour recevoir ta commande.
+  return `Hello M. ${order.name},
+
+Merci pour ta commande Veltrano.
+Merci de rester disponible sous 48 heures pour recevoir ta commande.
 
 Nom : ${order.name}
 Téléphone : ${order.phone}

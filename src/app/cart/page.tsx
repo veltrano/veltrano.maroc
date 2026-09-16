@@ -13,7 +13,7 @@ import {
   lineUnitCount,
   useCart,
 } from "@/lib/cart";
-import { applyCouponInput, getAppliedCode, setAppliedCode } from "@/lib/coupons";
+import { applyCouponRemote, getAppliedCode, setAppliedCode } from "@/lib/coupons";
 import { productImages } from "@/lib/product-images";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,9 +38,9 @@ export default function CartPage() {
     }
   }, []);
 
-  function onCoupon(e: FormEvent) {
+  async function onCoupon(e: FormEvent) {
     e.preventDefault();
-    const result = applyCouponInput(couponInput);
+    const result = await applyCouponRemote(couponInput);
     if (result.ok) {
       setApplied(result.code);
       setCouponMsg(`Code ${result.code} : −${mad(50)}`);

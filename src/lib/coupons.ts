@@ -39,33 +39,27 @@ export function unusedCoupon(code: string) {
   return c && !c.usedAt ? c : undefined;
 }
 
-function existingCodes() {
-  return new Set(readCoupons().map((c) => c.code));
+export function saveIssuedCoupon(code: string, orderId: string, amountMad = COUPON_VALUE_MAD) {
+  const n = code.trim().toUpperCase();
+  if (!n) return;
+  const list = readCoupons().filter((c) => c.code !== n);
+  writeCoupons([
+    {
+      code: n,
+      amountMad,
+      orderId,
+      createdAt: new Date().toISOString(),
+    },
+    ...list,
+  ]);
 }
 
-export function generateCouponCode() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const used = existingCodes();
-  for (let i = 0; i < 20; i++) {
-    let tail = "";
-    for (let j = 0; j < 6; j++) {
-      tail += alphabet[Math.floor(Math.random() * alphabet.length)];
-    }
-    const code = `VT50-${tail}`;
-    if (!used.has(code)) return code;
+export function rememberValidCoupon(code: string, amountMad = COUPON_VALUE_MAD) {
+  const n = code.trim().toUpperCase();
+  if (!unusedCoupon(n)) {
+    saveIssuedCoupon(n, "remote", amountMad);
   }
-  return `VT50-${Date.now().toString(36).toUpperCase()}`;
-}
-
-export function issueCoupon(orderId: string): Coupon {
-  const coupon: Coupon = {
-    code: generateCouponCode(),
-    amountMad: COUPON_VALUE_MAD,
-    orderId,
-    createdAt: new Date().toISOString(),
-  };
-  writeCoupons([coupon, ...readCoupons()]);
-  return coupon;
+  setAppliedCode(n);
 }
 
 export function markCouponUsed(code: string, usedOnOrderId: string) {
@@ -96,4 +90,20 @@ export function applyCouponInput(raw: string): { ok: true; code: string } | { ok
   if (!c) return { ok: false, error: "Code invalide ou déjà utilisé." };
   setAppliedCode(code);
   return { ok: true, code };
+}
+
+export async function applyCouponRemote(raw: string) {
+  const code = raw.trim().toUpperCase();
+  if (!code) return { ok: false as const, error: "Entre un code." };
+  try {
+    const res = await fetch(`/api/coupons/${encodeURIComponent(code)}`);
+    const json = (await res.json()) as { ok?: boolean; code?: string; amountMad?: number; error?: string };
+    if (res.ok && json.ok && json.code) {
+      rememberValidCoupon(json.code, json.amountMad ?? COUPON_VALUE_MAD);
+      return { ok: true as const, code: json.code };
+    }
+  } catch {
+    /* fall through to local cache */
+  }
+  return applyCouponInput(code);
 }

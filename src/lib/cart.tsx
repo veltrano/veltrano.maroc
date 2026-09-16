@@ -7,40 +7,24 @@ import {
   useMemo,
   useSyncExternalStore,
 } from "react";
-import { packPrice, productBySlug, type Product } from "@/data/catalog";
+import type { Product } from "@/data/catalog";
+import { productBySlug } from "@/data/catalog";
 import {
   COUPON_VALUE_MAD,
   getAppliedCode,
-  issueCoupon,
-  markCouponUsed,
   setAppliedCode,
   unusedCoupon,
 } from "@/lib/coupons";
+import {
+  cartSubtotal as subtotalOf,
+  cartUnitCount as unitCountOf,
+  linePrice as priceOf,
+  lineUnitCount as unitOf,
+  type CartLine,
+  type Order,
+} from "@/lib/order";
 
-export type CartLine = {
-  id: string;
-  slug: string;
-  pack: "single" | "duo";
-  size: string;
-  sizeB?: string;
-  quantity: number;
-};
-
-export type Order = {
-  id: string;
-  createdAt: string;
-  name: string;
-  phone: string;
-  city: string;
-  address: string;
-  notes: string;
-  lines: CartLine[];
-  subtotalMad: number;
-  discountMad: number;
-  totalMad: number;
-  appliedCoupon?: string;
-  rewardCoupon: string;
-};
+export type { CartLine, Order };
 
 const CART_KEY = "veltrano:cart";
 const ORDERS_KEY = "veltrano:orders";
@@ -107,15 +91,15 @@ const EMPTY_CART: CartLine[] = [];
 const EMPTY_ORDERS: Order[] = [];
 
 export function lineUnitCount(line: CartLine) {
-  return line.pack === "duo" ? line.quantity * 2 : line.quantity;
+  return unitOf(line);
 }
 
 export function linePrice(line: CartLine) {
-  return packPrice(lineUnitCount(line));
+  return priceOf(line);
 }
 
 export function cartSubtotal(lines: CartLine[]) {
-  return lines.reduce((sum, line) => sum + linePrice(line), 0);
+  return subtotalOf(lines);
 }
 
 export function cartDiscount(lines: CartLine[], couponCode?: string | null) {
@@ -131,7 +115,7 @@ export function cartTotal(lines: CartLine[], couponCode?: string | null) {
 }
 
 export function cartUnitCount(lines: CartLine[]) {
-  return lines.reduce((sum, line) => sum + lineUnitCount(line), 0);
+  return unitCountOf(lines);
 }
 
 type CartApi = {
@@ -141,7 +125,7 @@ type CartApi = {
   setQty: (id: string, quantity: number) => void;
   remove: (id: string) => void;
   clear: () => void;
-  placeOrder: (info: Omit<Order, "id" | "createdAt" | "lines" | "subtotalMad" | "discountMad" | "totalMad" | "appliedCoupon" | "rewardCoupon">) => Order;
+  rememberOrder: (order: Order) => void;
 };
 
 const CartContext = createContext<CartApi | null>(null);
@@ -195,37 +179,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     persistCart();
   }, []);
 
-  const placeOrder = useCallback(
-    (info: Omit<Order, "id" | "createdAt" | "lines" | "subtotalMad" | "discountMad" | "totalMad" | "appliedCoupon" | "rewardCoupon">) => {
-      const id = `VT-${Date.now().toString(36).toUpperCase()}`;
-      const applied = getAppliedCode();
-      const subtotalMad = cartSubtotal(cart);
-      const discountMad = cartDiscount(cart, applied);
-      if (applied && discountMad > 0) {
-        markCouponUsed(applied, id);
-      }
-      const reward = issueCoupon(id);
-      const order: Order = {
-        ...info,
-        id,
-        createdAt: new Date().toISOString(),
-        lines: [...cart],
-        subtotalMad,
-        discountMad,
-        totalMad: Math.max(0, subtotalMad - discountMad),
-        appliedCoupon: discountMad > 0 ? applied ?? undefined : undefined,
-        rewardCoupon: reward.code,
-      };
-      orders = [order, ...orders];
-      persistOrders();
-      cart = [];
-      persistCart();
-      setAppliedCode(null);
-      emitCart();
-      return order;
-    },
-    []
-  );
+  const rememberOrder = useCallback((order: Order) => {
+    orders = [order, ...orders.filter((o) => o.id !== order.id)];
+    persistOrders();
+    cart = [];
+    persistCart();
+    setAppliedCode(null);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -235,9 +195,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setQty,
       remove,
       clear,
-      placeOrder,
+      rememberOrder,
     }),
-    [lines, savedOrders, add, setQty, remove, clear, placeOrder]
+    [lines, savedOrders, add, setQty, remove, clear, rememberOrder]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

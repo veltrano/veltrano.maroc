@@ -1,28 +1,61 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PRODUCTS, displayName, mad } from "@/data/catalog";
-import { linePrice, lineProduct, useCart } from "@/lib/cart";
-import { customerWhatsAppUrl } from "@/lib/whatsapp";
-import { orderWhatsAppMessage } from "@/lib/order-message";
-import { COUPON_VALUE_MAD } from "@/lib/coupons";
+import { linePrice, lineProduct } from "@/lib/cart";
+import { COUPON_VALUE_MAD, saveIssuedCoupon } from "@/lib/coupons";
+import type { Order } from "@/lib/order";
 import { ProductCard } from "@/components/product-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function ThankYouPage() {
   const params = useParams<{ id: string }>();
-  const { orders } = useCart();
-  const order = orders.find((o) => o.id === params.id);
-  const wa = order ? customerWhatsAppUrl(order.phone, orderWhatsAppMessage(order)) : null;
+  const [order, setOrder] = useState<Order | null>(null);
+  const [status, setStatus] = useState<"loading" | "ok" | "missing">("loading");
 
-  if (!order) {
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch(`/api/orders/${params.id}`);
+        if (!res.ok) {
+          if (!cancelled) setStatus("missing");
+          return;
+        }
+        const json = (await res.json()) as { order: Order };
+        if (!cancelled) {
+          setOrder(json.order);
+          saveIssuedCoupon(json.order.rewardCoupon, json.order.id);
+          setStatus("ok");
+        }
+      } catch {
+        if (!cancelled) setStatus("missing");
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id]);
+
+  if (status === "loading") {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <h1 className="font-heading text-3xl">Confirmation</h1>
+        <p className="mt-3 text-muted-foreground">Chargement de ta commande…</p>
+      </div>
+    );
+  }
+
+  if (status === "missing" || !order) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <h1 className="font-heading text-3xl">Commande introuvable</h1>
         <p className="mt-3 text-muted-foreground">
-          Cette confirmation est enregistrée uniquement sur cet appareil.
+          Cette confirmation n’est pas dans le registre Veltrano.
         </p>
         <Link href="/boutique" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Continuer les achats
@@ -30,6 +63,8 @@ export default function ThankYouPage() {
       </div>
     );
   }
+
+  const whatsappSent = order.whatsapp?.status === "sent";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -43,6 +78,14 @@ export default function ThankYouPage() {
         <p className="mt-2 text-muted-foreground">
           Merci d’être disponible pour recevoir ta commande sous <strong>48 heures</strong>.
         </p>
+        {whatsappSent ? (
+          <p className="mt-4 text-sm">Un récapitulatif t’a été envoyé sur WhatsApp.</p>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">
+            L’équipe a bien enregistré ta commande et te rappelle — pas besoin d’envoyer un
+            message WhatsApp.
+          </p>
+        )}
         <p className="mt-8 text-lg">
           Tu as débloqué un coupon de 50 DH pour ta prochaine commande. 🎁
         </p>
@@ -82,21 +125,6 @@ export default function ThankYouPage() {
           <Link href="/boutique" className={cn(buttonVariants({ size: "lg" }), "inline-flex")}>
             Continuer les achats
           </Link>
-          {wa ? (
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "inline-flex")}
-            >
-              Confirmer sur WhatsApp
-            </a>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              WhatsApp n’a pas pu s’ouvrir pour ce numéro. Vérifie le téléphone de la
-              commande.
-            </p>
-          )}
         </div>
       </section>
 

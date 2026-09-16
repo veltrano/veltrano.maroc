@@ -31,7 +31,11 @@ Sans photos, chaque fiche affiche un placeholder teinté.
 - Accueil (lifestyle, 4 pièces, films clients), Boutique, Homme, Femme (bientôt)
 - Grille boutique, filtres coupe / couleur
 - Fiche produit : galerie, pack 1 ou 2 (tailles distinctes sur le duo), stock
-- Panier et commande locale (pas de paiement en ligne)
+- Panier et commande enregistrée côté serveur (pas de paiement en ligne)
+- Page merci, coupon 50 DH, tableau d’équipe `/admin`
 - Popup email −10%, 5 secondes après l’arrivée
+- WhatsApp boutique : +212 777-236482. Envoi auto au client si identifiants API (voir `.env.example`)
+
+Identifiants optionnels : `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, ou Twilio `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_WHATSAPP_FROM`. Sans eux, le récapitulatif est mis en file (`data/store/whatsapp-queue.json`) et la page merci ne prétend pas qu’il a été envoyé.
 
 Catalogue source : `src/data/product-catalog.csv` (export de la Google Sheet).
