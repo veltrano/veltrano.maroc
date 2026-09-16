@@ -47,11 +47,7 @@ next-env.d.ts
 # Server-side order store (customer PII)
 /data/store/*.json
 
-# Drive product photos are copied locally (too large for git)
-/public/products/**/*.png
-/public/products/**/*.jpg
-/public/products/**/*.jpeg
-/public/products/**/*.webp
-/public/lifestyle/**
-/public/videos/**
+# Catalogue Drive photos (~720MB) — copy on the VPS, do not push to GitHub
+/public/products/*
+!/public/products/placeholders/
 

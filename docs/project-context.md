@@ -37,3 +37,5 @@ Without Meta or Twilio credentials, the French recap (`Hello M. {name}` + order 
 - Coupons: `VT50-XXXXXX`, 50 DH, one-time, apply in cart/checkout. Issued on each order for the *next* purchase (server + local cache).
 - Thank-you route: `/thank-you/[id]` loads the order from `GET /api/orders/[id]`.
 - Popup 5s after visit start. Dev server port **43127**.
+- Production: Docker standalone (`output: "standalone"`), listen on EasyPanel `PORT`/`HOST`, persist `DATA_DIR` (default `data/store`). GitHub must not include `public/products` (~720MB); mount that folder on the VPS. Lifestyle + client videos are in git.
+- Go-live still needs: GitHub repo URL, EasyPanel URL/domain, `gh auth` on this machine. Do not invent a remote. Site is not live until a public URL responds.

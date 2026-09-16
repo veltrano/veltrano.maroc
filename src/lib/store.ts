@@ -2,7 +2,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { Coupon, Order, WhatsAppQueueItem } from "@/lib/order";
 
-const DIR = path.join(process.cwd(), "data", "store");
+const DIR =
+  process.env.DATA_DIR || path.join(process.cwd(), "data", "store");
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const COUPONS_FILE = path.join(DIR, "coupons.json");
 const QUEUE_FILE = path.join(DIR, "whatsapp-queue.json");

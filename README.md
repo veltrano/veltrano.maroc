@@ -14,7 +14,21 @@ npm run dev
 
 Ouvre [http://localhost:43127](http://localhost:43127).
 
-Build de prod : `npm run build` puis `npm start`.
+Build de prod : `npm run build` puis `npm start` (écoute `PORT`, défaut 43127).
+
+## EasyPanel (VPS)
+
+1. Repo GitHub `veltrano` (les photos catalogue ~720 MB ne sont **pas** dans git).
+2. App EasyPanel **from GitHub**, builder **Dockerfile** (fichier `Dockerfile` à la racine).
+3. Port du conteneur : **3000** (ou la variable `PORT` injectée par EasyPanel — l’entrypoint la respecte, ainsi que `HOST` → `HOSTNAME`).
+4. Volume persistant : hôte → `/app/data/store` (commandes, coupons, file WhatsApp). Définir `DATA_DIR=/app/data/store`.
+5. Volume optionnel photos : hôte → `/app/public/products` (copier le dossier Drive / `npm run sync-images` sur le VPS). Sans ça, placeholders seulement.
+6. Variables : copier `.env.example` (`ADMIN_SECRET`, WhatsApp Meta ou Twilio). Ne pas committer les secrets.
+7. Start : l’image lance `node server.js` (standalone). Pas besoin d’une start command npm si le builder est Docker.
+
+`docker compose up --build` en local utilise le volume `veltrano-orders`.
+
+Lifestyle + films clients sont dans git (`public/lifestyle`, `public/videos`).
 
 ## Photos produit
 

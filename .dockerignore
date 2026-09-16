@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+!README.md
+agent-tools
+coverage
+.env
+.env.*
+!.env.example
+data/store/*.json
+public/products
+!public/products/placeholders
+Dockerfile*
+docker-compose*.yml
+.dockerignore
