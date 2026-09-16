@@ -12,10 +12,10 @@ import { t, type MessageKey } from "./translate";
 export async function getLocale(): Promise<Locale> {
   const cookieStore = await cookies();
   const hdrs = await headers();
-  const cookieLocale = parseLocale(cookieStore.get(COOKIE_LOCALE)?.value);
-  if (cookieLocale) return cookieLocale;
   const fromMw = parseLocale(hdrs.get(LOCALE_HEADER));
   if (fromMw) return fromMw;
+  const cookieLocale = parseLocale(cookieStore.get(COOKIE_LOCALE)?.value);
+  if (cookieLocale) return cookieLocale;
   return localeFromAcceptLanguage(hdrs.get("accept-language")) ?? DEFAULT_LOCALE;
 }
 

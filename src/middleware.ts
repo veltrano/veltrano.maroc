@@ -15,9 +15,10 @@ export function middleware(req: NextRequest) {
     return new NextResponse(null, { status: 204, headers: cors });
   }
 
+  const q = parseLocale(req.nextUrl.searchParams.get("lang"));
   const cookieLocale = parseLocale(req.cookies.get(COOKIE_LOCALE)?.value);
   const locale =
-    cookieLocale ?? localeFromAcceptLanguage(req.headers.get("accept-language"));
+    q ?? cookieLocale ?? localeFromAcceptLanguage(req.headers.get("accept-language"));
 
   const res = NextResponse.next();
   res.headers.set(LOCALE_HEADER, locale);

@@ -1,8 +1,10 @@
-import { CatalogGrid } from "@/components/catalog-grid";
-import { getT } from "@/lib/i18n/server";
+"use client";
 
-export default async function BoutiquePage() {
-  const { t } = await getT();
+import { CatalogGrid } from "@/components/catalog-grid";
+import { useI18n } from "@/lib/i18n/provider";
+
+export default function BoutiquePage() {
+  const { t } = useI18n();
   return (
     <div className="bg-white">
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

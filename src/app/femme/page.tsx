@@ -1,8 +1,10 @@
-import { EmailCapture } from "@/components/email-capture";
-import { getT } from "@/lib/i18n/server";
+"use client";
 
-export default async function FemmePage() {
-  const { t } = await getT();
+import { EmailCapture } from "@/components/email-capture";
+import { useI18n } from "@/lib/i18n/provider";
+
+export default function FemmePage() {
+  const { t } = useI18n();
   return (
     <div className="bg-white">
       <section className="border-b border-border bg-white">

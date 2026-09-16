@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { buttonVariants } from "@/components/ui/button";
 import { CLIENT_VIDEOS, featuredProducts, mad } from "@/data/catalog";
 import { cn } from "@/lib/utils";
-import { getT } from "@/lib/i18n/server";
+import { useI18n } from "@/lib/i18n/provider";
 import type { MessageKey } from "@/lib/i18n/messages";
 
 const VIDEO_KEYS = [
@@ -13,8 +15,8 @@ const VIDEO_KEYS = [
   "home.video.house",
 ] as const satisfies readonly MessageKey[];
 
-export default async function HomePage() {
-  const { t } = await getT();
+export default function HomePage() {
+  const { t } = useI18n();
   const featured = featuredProducts();
 
   return (

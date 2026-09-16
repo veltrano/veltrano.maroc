@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import {
   dirFor,
   localeFromNavigator,
+  parseLocale,
   persistLocaleCookies,
   readStoredChoice,
   type Locale,
@@ -45,16 +46,30 @@ export function LocaleProvider({
 
   const setLocale = useCallback(
     (next: Locale, opts?: { explicit?: boolean }) => {
+      const explicit = opts?.explicit !== false;
       setLocaleState(next);
-      applyDom(next);
-      persistLocaleCookies(next, opts?.explicit !== false);
+      if (typeof document !== "undefined") applyDom(next);
+      persistLocaleCookies(next, explicit);
       router.refresh();
     },
     [router]
   );
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = parseLocale(params.get("lang"));
     const stored = readStoredChoice();
+    if (fromQuery) {
+      if (fromQuery !== locale) {
+        setLocaleState(fromQuery);
+        applyDom(fromQuery);
+        persistLocaleCookies(fromQuery, true);
+        router.refresh();
+      } else {
+        applyDom(fromQuery);
+      }
+      return;
+    }
     if (stored) {
       if (stored.locale !== locale) {
         setLocaleState(stored.locale);
@@ -73,7 +88,6 @@ export function LocaleProvider({
       persistLocaleCookies(detected, false);
       router.refresh();
     }
-    // First visit: follow the phone/browser, do not stamp an explicit choice.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

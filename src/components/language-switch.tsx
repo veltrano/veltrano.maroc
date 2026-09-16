@@ -8,6 +8,7 @@ export function LanguageSwitch() {
   const { locale, setLocale, t } = useI18n();
 
   function pick(next: Locale) {
+    if (next === locale) return;
     setLocale(next, { explicit: true });
   }
 
@@ -15,7 +16,7 @@ export function LanguageSwitch() {
     <div
       role="group"
       aria-label={t("lang.switch")}
-      className="flex items-center rounded-full border border-border text-xs font-medium"
+      className="flex shrink-0 items-center rounded-full border border-foreground/25 bg-white p-0.5 text-xs font-semibold tracking-wide"
     >
       <button
         type="button"
@@ -29,7 +30,7 @@ export function LanguageSwitch() {
             : "text-muted-foreground hover:text-foreground"
         )}
       >
-        {t("lang.fr")}
+        FR
       </button>
       <button
         type="button"
@@ -43,7 +44,7 @@ export function LanguageSwitch() {
             : "text-muted-foreground hover:text-foreground"
         )}
       >
-        {t("lang.ar")}
+        عربي
       </button>
     </div>
   );
