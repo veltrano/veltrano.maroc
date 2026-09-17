@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Fit } from "@/data/catalog";
 import { sizeGuideForFit } from "@/data/size-guides";
 import { useI18n } from "@/lib/i18n/provider";
@@ -31,6 +31,7 @@ export function SizeGuideModal({
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const [zoom, setZoom] = useState(1);
   const title = locale === "ar" ? TITLE_AR[fit] : guide.modalTitle;
   const method = locale === "ar" ? METHOD_AR[fit] : guide.methodNote;
   const cutLabel =
@@ -44,6 +45,7 @@ export function SizeGuideModal({
 
   useEffect(() => {
     if (!open) return;
+    setZoom(1);
     previouslyFocused.current = document.activeElement as HTMLElement | null;
     const timer = window.setTimeout(() => closeRef.current?.focus(), 0);
     const onKey = (e: KeyboardEvent) => {
@@ -93,12 +95,40 @@ export function SizeGuideModal({
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
           <p className="text-sm text-muted-foreground">{method}</p>
 
-          <div className="mt-4 overflow-auto rounded-xl border border-border bg-neutral-50">
+          <div className="mt-4 flex items-center justify-end gap-2">
+            <span className="text-sm text-muted-foreground" aria-live="polite">
+              {Math.round(zoom * 100)} %
+            </span>
+            <button
+              type="button"
+              className="flex size-11 items-center justify-center rounded-lg border border-border text-xl font-medium"
+              onClick={() => setZoom((value) => Math.max(1, value - 0.5))}
+              disabled={zoom <= 1}
+              aria-label={t("sizeGuide.zoomOut")}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              className="flex size-11 items-center justify-center rounded-lg border border-border text-xl font-medium"
+              onClick={() => setZoom((value) => Math.min(2.5, value + 0.5))}
+              disabled={zoom >= 2.5}
+              aria-label={t("sizeGuide.zoomIn")}
+            >
+              +
+            </button>
+          </div>
+
+          <div
+            className="mt-2 max-h-[70vh] overflow-auto overscroll-contain rounded-xl border border-border bg-neutral-50"
+            style={{ touchAction: "pan-x pan-y pinch-zoom" }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={guide.imageSrc}
               alt={guide.imageAlt}
-              className="mx-auto max-h-[70vh] w-full origin-top object-contain sm:max-h-none"
+              className="mx-auto max-w-none origin-top object-contain transition-[width] duration-200"
+              style={{ width: `${zoom * 100}%` }}
             />
           </div>
 

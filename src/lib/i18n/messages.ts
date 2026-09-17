@@ -279,6 +279,8 @@ export const messages = {
     "footer.exchange": "Échange de taille gratuit sous 7 jours après réception",
     "footer.ranges": "Homme disponible · Femme et Enfant en préparation",
     "sizeGuide.close": "Fermer",
+    "sizeGuide.zoomIn": "Agrandir le guide",
+    "sizeGuide.zoomOut": "Réduire le guide",
     "sizeGuide.tableCaption": "Tableau des mesures — {cut}",
     "sizeGuide.sizeCol": "Taille",
 
@@ -574,6 +576,8 @@ export const messages = {
     "footer.exchange": "استبدال المقاس مجانًا عند تقديم الطلب خلال 7 أيام من الاستلام",
     "footer.ranges": "رجال متوفر · نساء وأطفال قيد التحضير",
     "sizeGuide.close": "إغلاق",
+    "sizeGuide.zoomIn": "تكبير الدليل",
+    "sizeGuide.zoomOut": "تصغير الدليل",
     "sizeGuide.tableCaption": "جدول القياسات — {cut}",
     "sizeGuide.sizeCol": "المقاس",
 
