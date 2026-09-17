@@ -245,8 +245,9 @@ export function ProductDetail({ product }: { product: Product }) {
               <Label>{pack === "duo" ? "Jean 1 — taille" : "Taille"}</Label>
               <button
                 type="button"
-                className="text-sm underline underline-offset-2"
+                className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm underline underline-offset-2 hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 onClick={() => setGuideOpen(true)}
+                aria-haspopup="dialog"
               >
                 Guide des tailles
               </button>
