@@ -3,6 +3,19 @@
 import { useEffect, useId, useRef } from "react";
 import type { Fit } from "@/data/catalog";
 import { sizeGuideForFit } from "@/data/size-guides";
+import { useI18n } from "@/lib/i18n/provider";
+
+const METHOD_AR: Record<Fit, string> = {
+  baggy:
+    "قياسات الجينز مسطّحًا (سم)، وفق العلامات A–D في الدليل. A: الخصر. B: الحوض. C: فتحة الساق. D: الطول. المقاسات المتاحة للشراء تبقى كما في مخزون الموديل.",
+  straight:
+    "قياسات الجينز مسطّحًا (سم)، وفق العلامات A–D في الدليل. A: الخصر. B: الحوض. C: فتحة الساق. D: الطول. المقاسات المتاحة للشراء تبقى كما في مخزون الموديل.",
+};
+
+const TITLE_AR: Record<Fit, string> = {
+  baggy: "دليل المقاسات — باجي",
+  straight: "دليل المقاسات — قصّة مستقيمة",
+};
 
 export function SizeGuideModal({
   fit,
@@ -14,14 +27,25 @@ export function SizeGuideModal({
   onClose: () => void;
 }) {
   const guide = sizeGuideForFit(fit);
+  const { t, locale } = useI18n();
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const title = locale === "ar" ? TITLE_AR[fit] : guide.modalTitle;
+  const method = locale === "ar" ? METHOD_AR[fit] : guide.methodNote;
+  const cutLabel =
+    locale === "ar"
+      ? fit === "baggy"
+        ? "باجي"
+        : "قصّة مستقيمة"
+      : fit === "baggy"
+        ? "Baggy"
+        : "Coupe droite";
 
   useEffect(() => {
     if (!open) return;
     previouslyFocused.current = document.activeElement as HTMLElement | null;
-    const t = window.setTimeout(() => closeRef.current?.focus(), 0);
+    const timer = window.setTimeout(() => closeRef.current?.focus(), 0);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -29,7 +53,7 @@ export function SizeGuideModal({
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.clearTimeout(t);
+      window.clearTimeout(timer);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
       previouslyFocused.current?.focus?.();
@@ -54,7 +78,7 @@ export function SizeGuideModal({
       >
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
           <h2 id={titleId} className="font-heading text-lg sm:text-xl">
-            {guide.modalTitle}
+            {title}
           </h2>
           <button
             ref={closeRef}
@@ -62,12 +86,12 @@ export function SizeGuideModal({
             onClick={onClose}
             className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
           >
-            Fermer
+            {t("sizeGuide.close")}
           </button>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
-          <p className="text-sm text-muted-foreground">{guide.methodNote}</p>
+          <p className="text-sm text-muted-foreground">{method}</p>
 
           <div className="mt-4 overflow-auto rounded-xl border border-border bg-neutral-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -81,12 +105,12 @@ export function SizeGuideModal({
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[320px] border-collapse text-sm">
               <caption className="mb-2 text-start font-medium">
-                Tableau des mesures — {fit === "baggy" ? "Baggy" : "Coupe droite"}
+                {t("sizeGuide.tableCaption", { cut: cutLabel })}
               </caption>
               <thead>
                 <tr className="border-b border-border text-start">
                   <th scope="col" className="py-2 pe-3 font-medium">
-                    Taille
+                    {t("sizeGuide.sizeCol")}
                   </th>
                   {guide.columns.map((col) => (
                     <th key={col.key} scope="col" className="py-2 pe-3 font-medium">

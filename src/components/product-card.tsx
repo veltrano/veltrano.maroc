@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { mad, type Product } from "@/data/catalog";
+import { getProductContent } from "@/data/product-content-i18n";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ export function ProductCard({
   const [showWorn, setShowWorn] = useState(false);
   const size = product.sizes[2] ?? product.sizes[0];
   const fit = translate(locale, product.fit === "baggy" ? "fit.baggy" : "fit.straight");
-  const title = product.content.title;
+  const content = getProductContent(product.slug, locale) ?? product.content;
 
   return (
     <div className="group">
@@ -44,7 +45,7 @@ export function ProductCard({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={showWorn ? worn : flat}
-            alt={product.content.imageAltFlat}
+            alt={content.imageAltFlat}
             className="h-full w-full object-contain transition duration-300"
           />
           {!live ? (
@@ -55,10 +56,10 @@ export function ProductCard({
         </div>
         <div className="mt-3 space-y-1">
           <p className="text-sm text-muted-foreground">{fit}</p>
-          <h3 className="font-heading text-base leading-tight sm:text-lg">{title}</h3>
+          <h3 className="font-heading text-base leading-tight sm:text-lg">{content.title}</h3>
           <p className="text-sm">{mad(product.unitPriceMad)}</p>
           <p className="text-xs text-muted-foreground">
-            Pack de 2 · {mad(product.duoPriceMad)}
+            {t("product.pack2short", { price: mad(product.duoPriceMad) })}
           </p>
         </div>
       </Link>

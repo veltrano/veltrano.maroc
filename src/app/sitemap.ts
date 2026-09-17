@@ -11,6 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/homme`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/femme`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     {
+      url: `${base}/enfant`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
       url: `${base}/aide/livraison-retours`,
       lastModified: now,
       changeFrequency: "monthly",

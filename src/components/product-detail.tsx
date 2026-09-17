@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   duoPerJeanMad,
@@ -11,7 +11,9 @@ import {
   productsByFit,
   type Product,
 } from "@/data/catalog";
-import { SERVICE_LINE_MOBILE } from "@/data/product-content";
+import { SERVICE_LINE_MOBILE, SERVICE_LINE_MOBILE_AR } from "@/data/product-content";
+import { getProductContent } from "@/data/product-content-i18n";
+import { swatchImageForSlug } from "@/data/product-colours";
 import { productImages, hasCatalogPhotos } from "@/lib/product-images";
 import { useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -22,11 +24,14 @@ import { ProductReviews } from "@/components/product-reviews";
 import { ProductJsonLd } from "@/components/product-json-ld";
 import { shopWhatsAppUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function ProductDetail({ product }: { product: Product }) {
+  const { t, locale } = useI18n();
   const images = productImages(product);
   const live = hasCatalogPhotos(product.slug);
-  const content = product.content;
+  const content = getProductContent(product.slug, locale) ?? product.content;
+  const serviceLines = locale === "ar" ? SERVICE_LINE_MOBILE_AR : SERVICE_LINE_MOBILE;
   const [active, setActive] = useState(0);
   const [pack, setPack] = useState<"single" | "duo">("single");
   const [size, setSize] = useState(product.sizes[2] ?? product.sizes[0]);
@@ -104,7 +109,7 @@ export function ProductDetail({ product }: { product: Product }) {
             />
             {!live ? (
               <Badge className="absolute start-4 top-4 bg-background/90 text-foreground">
-                Photo Drive en attente
+                {t('product.photoDrive')}
               </Badge>
             ) : null}
             {images.length > 1 ? (
@@ -149,13 +154,13 @@ export function ProductDetail({ product }: { product: Product }) {
         <div ref={buyRef} className="space-y-6">
           <div>
             <p className="text-sm uppercase tracking-widest text-muted-foreground">
-              {product.fit === "baggy" ? "Baggy" : "Coupe droite"}
-              {product.fit === "straight" ? " · Straight fit" : null}
+              {product.fit === "baggy" ? t("fit.baggy") : t("fit.straight")}
+              {product.fit === "straight" && locale === "fr" ? " · Straight fit" : null}
             </p>
             <h1 className="font-heading mt-1 text-3xl sm:text-4xl">{content.h1}</h1>
             <p className="mt-3 text-lg font-medium">{mad(total)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {mad(product.unitPriceMad)} l’unité · {mad(product.duoPriceMad)} le pack de 2
+              {t('product.packPrice', { unit: mad(product.unitPriceMad), duo: mad(product.duoPriceMad) })}
             </p>
           </div>
 
@@ -173,43 +178,55 @@ export function ProductDetail({ product }: { product: Product }) {
           </ul>
 
           <p className="text-sm">
-            <span className="font-medium">Composition :</span> {content.composition}
+            <span className="font-medium">{t("product.composition")}</span> {content.composition}
           </p>
 
           {/* Colour siblings */}
           <div className="space-y-2">
-            <Label>Coloris — même coupe</Label>
+            <Label>{t('product.colours')}</Label>
             <div className="flex flex-wrap gap-2">
               <span
-                className="inline-flex items-center gap-2 rounded-full border border-foreground px-3 py-1.5 text-sm"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-foreground px-3 py-1.5 text-sm"
                 title={content.colourLabel}
+                aria-current="true"
               >
                 <span
-                  className="size-3 rounded-full border border-black/10"
-                  style={{ backgroundColor: product.colourHex }}
+                  className="size-6 overflow-hidden rounded-full border border-black/15 bg-cover bg-center"
+                  style={{
+                    backgroundColor: product.colourHex,
+                    backgroundImage: `url(${swatchImageForSlug(product.slug)})`,
+                  }}
+                  aria-hidden
                 />
                 {content.colourLabel}
               </span>
-              {siblings.map((s) => (
+              {siblings.map((s) => {
+                const siblingContent = getProductContent(s.slug, locale) ?? s.content;
+                return (
                 <Link
                   key={s.slug}
                   href={`/product/${s.slug}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm hover:border-foreground"
-                  title={s.content.colourLabel}
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm hover:border-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  title={siblingContent.colourLabel}
+                  aria-label={siblingContent.colourLabel}
                 >
                   <span
-                    className="size-3 rounded-full border border-black/10"
-                    style={{ backgroundColor: s.colourHex }}
+                    className="size-6 overflow-hidden rounded-full border border-black/15 bg-cover bg-center"
+                    style={{
+                      backgroundColor: s.colourHex,
+                      backgroundImage: `url(${swatchImageForSlug(s.slug)})`,
+                    }}
+                    aria-hidden
                   />
-                  <span className="sr-only sm:not-sr-only">{s.content.colourLabel}</span>
+                  <span className="sr-only sm:not-sr-only">{siblingContent.colourLabel}</span>
                 </Link>
-              ))}
+              );})}
             </div>
           </div>
 
           {/* Pack */}
           <div className="space-y-2">
-            <Label>Offre</Label>
+            <Label>{t('product.offer')}</Label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -219,7 +236,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   pack === "single" ? "border-foreground bg-white" : "border-border"
                 )}
               >
-                <div className="font-medium">1 jean</div>
+                <div className="font-medium">{t("product.oneJeanLabel")}</div>
                 <div className="text-sm text-muted-foreground">{mad(product.unitPriceMad)}</div>
               </button>
               <button
@@ -230,10 +247,10 @@ export function ProductDetail({ product }: { product: Product }) {
                   pack === "duo" ? "border-foreground bg-white" : "border-border"
                 )}
               >
-                <div className="font-medium">Pack de 2</div>
+                <div className="font-medium">{t("product.pack2Label")}</div>
                 <div className="text-sm text-muted-foreground">{mad(product.duoPriceMad)}</div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {mad(perJean)} par jean · Économisez {mad(savings)}
+                  {t('product.perJeanSave', { per: mad(perJean), save: mad(savings) })}
                 </div>
               </button>
             </div>
@@ -242,18 +259,18 @@ export function ProductDetail({ product }: { product: Product }) {
           {/* Sizes */}
           <div ref={sizeRef} className="space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <Label>{pack === "duo" ? "Jean 1 — taille" : "Taille"}</Label>
+              <Label>{pack === "duo" ? t("product.sizeJean1") : t("product.size")}</Label>
               <button
                 type="button"
                 className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm underline underline-offset-2 hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 onClick={() => setGuideOpen(true)}
                 aria-haspopup="dialog"
               >
-                Guide des tailles
+                {t('product.guide')}
               </button>
             </div>
             {sizePrompt ? (
-              <p className="text-sm text-destructive">Choisissez votre taille pour continuer.</p>
+              <p className="text-sm text-destructive">{t('product.chooseSize')}</p>
             ) : null}
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((s) => (
@@ -279,7 +296,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
           {pack === "duo" ? (
             <div className="space-y-2">
-              <Label>Jean 2 — taille</Label>
+              <Label>{t("product.sizeJean2")}</Label>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((s) => (
                   <button
@@ -297,14 +314,12 @@ export function ProductDetail({ product }: { product: Product }) {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Même coloris. Tailles indépendantes pour chaque jean du pack.
-              </p>
+              <p className="text-xs text-muted-foreground">{t("product.packSameColour")}</p>
             </div>
           ) : null}
 
           <div className="space-y-2">
-            <Label>{pack === "duo" ? "Quantité de packs" : "Quantité"}</Label>
+            <Label>{pack === "duo" ? t("product.qtyPacksLabel") : t("product.qty")}</Label>
             <div className="flex items-center gap-3">
               <Button
                 type="button"
@@ -326,7 +341,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 +
               </Button>
               {pack === "duo" ? (
-                <span className="text-sm text-muted-foreground">= {units} jeans</span>
+                <span className="text-sm text-muted-foreground">{t("product.jeansCount", { n: units })}</span>
               ) : null}
             </div>
           </div>
@@ -339,17 +354,17 @@ export function ProductDetail({ product }: { product: Product }) {
               <span className="font-medium">{mad(total)}</span>
             </div>
             <div className="mt-2 flex justify-between text-muted-foreground">
-              <span>Livraison</span>
-              <span>Gratuite</span>
+              <span>{t("product.shippingLine")}</span>
+              <span>{t("product.shippingFree")}</span>
             </div>
             <div className="mt-2 flex justify-between border-t border-border pt-2 font-medium">
-              <span>Total</span>
+              <span>{t("product.total")}</span>
               <span>{mad(total)}</span>
             </div>
           </div>
 
-          {soldOut ? <p className="text-sm text-destructive">Rupture de stock.</p> : null}
-          {added ? <p className="text-sm text-foreground">Ajouté au panier.</p> : null}
+          {soldOut ? <p className="text-sm text-destructive">{t('product.soldOut')}</p> : null}
+          {added ? <p className="text-sm text-foreground">{t('product.added')}</p> : null}
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
@@ -358,7 +373,7 @@ export function ProductDetail({ product }: { product: Product }) {
               disabled={soldOut}
               onClick={() => onAdd(false)}
             >
-              Ajouter au panier
+              {t('product.add')}
             </Button>
             <Button
               size="lg"
@@ -367,20 +382,20 @@ export function ProductDetail({ product }: { product: Product }) {
               disabled={soldOut}
               onClick={() => onAdd(true)}
             >
-              Commander maintenant
+              {t('product.orderNow')}
             </Button>
           </div>
 
           <div className="space-y-1 text-sm text-muted-foreground">
-            <p>{SERVICE_LINE_MOBILE[0]}</p>
+            <p>{serviceLines[0]}</p>
             <p>
               <Link href="/aide/livraison-retours" className="underline underline-offset-2">
-                {SERVICE_LINE_MOBILE[1]}
+                {serviceLines[1]}
               </Link>
             </p>
-            <p className="pt-1">Paiement à la commande · Confirmation par l’équipe Veltrano</p>
+            <p className="pt-1">{t('product.payNote')}</p>
             <p>
-              Besoin d’aide pour la taille ?{" "}
+              {t('product.sizeHelp')}{" "}
               <a
                 href={shopWhatsAppUrl(
                   `Bonjour, j’ai besoin d’aide pour choisir ma taille — ${content.title}`
@@ -389,7 +404,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 rel="noopener noreferrer"
                 className="underline underline-offset-2"
               >
-                Écrire sur WhatsApp
+                {t('product.waHelp')}
               </a>
             </p>
           </div>
@@ -404,11 +419,13 @@ export function ProductDetail({ product }: { product: Product }) {
           <p className="mt-4 leading-relaxed text-muted-foreground">{content.longDescription}</p>
         </div>
 
-        <ProductFaqs faqs={content.faqs} />
-        <ProductReviews fit={product.fit} productSlug={product.slug} />
+        <ProductFaqs faqs={content.faqs} title={t("product.faqTitle")} />
+        <Suspense fallback={null}>
+          <ProductReviews fit={product.fit} productSlug={product.slug} />
+        </Suspense>
 
         <div>
-          <h2 className="font-heading text-2xl">Dans la même coupe</h2>
+          <h2 className="font-heading text-2xl">{t("product.sameCut")}</h2>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
             {siblings.slice(0, 6).map((s) => {
               const img = productImages(s)[0];
@@ -462,7 +479,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 onAdd(false);
               }}
             >
-              Ajouter
+              {t('product.addShort')}
             </Button>
           </div>
         </div>
@@ -471,10 +488,16 @@ export function ProductDetail({ product }: { product: Product }) {
   );
 }
 
-function ProductFaqs({ faqs }: { faqs: { question: string; answer: string }[] }) {
+function ProductFaqs({
+  faqs,
+  title,
+}: {
+  faqs: { question: string; answer: string }[];
+  title: string;
+}) {
   return (
     <div>
-      <h2 className="font-heading text-2xl">Questions fréquentes</h2>
+      <h2 className="font-heading text-2xl">{title}</h2>
       <div className="mt-4 divide-y divide-border border-y border-border">
         {faqs.map((faq) => (
           <details key={faq.question} className="group py-3">

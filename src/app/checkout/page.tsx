@@ -211,8 +211,8 @@ export default function CheckoutPage() {
             </div>
           ) : null}
           <div className="flex justify-between text-muted-foreground">
-            <span>Livraison</span>
-            <span>Gratuite</span>
+            <span>{t("checkout.shipping")}</span>
+            <span>{t("checkout.shippingFree")}</span>
           </div>
         </div>
         <p className="mt-4 text-lg font-medium">{mad(total)}</p>

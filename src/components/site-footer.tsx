@@ -13,8 +13,7 @@ export function SiteFooter() {
         <div>
           <p className="font-heading text-lg text-foreground">Veltrano</p>
           <p className="mt-2 text-muted-foreground">
-            Veltrano, un vestiaire denim pour affirmer son style au quotidien. {mad(250)} le jean,{" "}
-            {mad(400)} le pack de 2.
+            {t("footer.blurb", { unit: mad(250), duo: mad(400) })}
           </p>
         </div>
         <div className="flex flex-col gap-2">
@@ -30,8 +29,11 @@ export function SiteFooter() {
           <Link href="/femme" className="hover:text-foreground">
             {t("nav.women")}
           </Link>
+          <Link href="/enfant" className="hover:text-foreground">
+            {t("nav.kids")}
+          </Link>
           <Link href="/aide/livraison-retours" className="hover:text-foreground">
-            Livraison &amp; échanges
+            {t("nav.help")}
           </Link>
           <a
             href={shopWhatsAppUrl()}
@@ -43,13 +45,13 @@ export function SiteFooter() {
           </a>
         </div>
         <div className="space-y-2 text-muted-foreground">
-          <p>Livraison gratuite au Maroc</p>
+          <p>{t("footer.freeShip")}</p>
           <p>
             <Link href="/aide/livraison-retours" className="underline underline-offset-2">
-              Échange de taille gratuit sous 7 jours après réception
+              {t("footer.exchange")}
             </Link>
           </p>
-          <p>Homme disponible · Femme en préparation</p>
+          <p>{t("footer.ranges")}</p>
         </div>
       </div>
     </footer>

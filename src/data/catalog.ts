@@ -1,4 +1,5 @@
 import { contentForSlug, type ProductContent } from "@/data/product-content";
+import { swatchHexForSlug } from "@/data/product-colours";
 
 export type Fit = "baggy" | "straight";
 
@@ -30,18 +31,6 @@ function slugify(name: string) {
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 }
-
-const COLOUR_HEX: Record<string, string> = {
-  "bleu blith": "#2f4f7a",
-  dorty: "#5c5348",
-  "double stone": "#8a8680",
-  "gris snow": "#b8b6b1",
-  noir: "#1a1a1a",
-  stone: "#7a7468",
-  gris: "#6e6e6e",
-  "gris liga": "#5a5c5e",
-  "gris noir": "#3a3a3c",
-};
 
 export const PRODUCTS: Product[] = [
   {
@@ -128,7 +117,7 @@ export const PRODUCTS: Product[] = [
     name: row.name,
     fit,
     colour: row.colour,
-    colourHex: COLOUR_HEX[row.colour] ?? "#4a5560",
+    colourHex: swatchHexForSlug(slug),
     sizes: row.sizes,
     stock: 100,
     unitPriceMad: UNIT_PRICE_MAD,
