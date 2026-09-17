@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useI18n } from "@/lib/i18n/provider";
 import { mad } from "@/data/catalog";
+import { useI18n } from "@/lib/i18n/provider";
+import { SHOP_WHATSAPP_DISPLAY, shopWhatsAppUrl } from "@/lib/whatsapp";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -12,7 +13,8 @@ export function SiteFooter() {
         <div>
           <p className="font-heading text-lg text-foreground">Veltrano</p>
           <p className="mt-2 text-muted-foreground">
-            {t("footer.blurb", { unit: mad(250), duo: mad(400) })}
+            Veltrano, un vestiaire denim pour affirmer son style au quotidien. {mad(250)} le jean,{" "}
+            {mad(400)} le pack de 2.
           </p>
         </div>
         <div className="flex flex-col gap-2">
@@ -28,11 +30,26 @@ export function SiteFooter() {
           <Link href="/femme" className="hover:text-foreground">
             {t("nav.women")}
           </Link>
+          <Link href="/aide/livraison-retours" className="hover:text-foreground">
+            Livraison &amp; échanges
+          </Link>
+          <a
+            href={shopWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground"
+          >
+            WhatsApp {SHOP_WHATSAPP_DISPLAY}
+          </a>
         </div>
-        <div className="text-muted-foreground">
-          <p>{t("footer.delivery")}</p>
-          <p>{t("footer.exchanges")}</p>
-          <p>{t("footer.news")}</p>
+        <div className="space-y-2 text-muted-foreground">
+          <p>Livraison gratuite au Maroc</p>
+          <p>
+            <Link href="/aide/livraison-retours" className="underline underline-offset-2">
+              Échange de taille gratuit sous 7 jours après réception
+            </Link>
+          </p>
+          <p>Homme disponible · Femme en préparation</p>
         </div>
       </div>
     </footer>

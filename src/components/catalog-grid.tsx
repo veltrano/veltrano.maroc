@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FITS, PRODUCTS, type Fit } from "@/data/catalog";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +9,20 @@ import { useI18n } from "@/lib/i18n/provider";
 
 const colours = ["all", ...Array.from(new Set(PRODUCTS.map((p) => p.colour)))];
 
+function parseFit(raw: string | null): Fit | "all" {
+  if (raw === "baggy" || raw === "straight") return raw;
+  return "all";
+}
+
 export function CatalogGrid() {
+  const search = useSearchParams();
   const [fit, setFit] = useState<Fit | "all">("all");
   const [colour, setColour] = useState("all");
   const { t } = useI18n();
+
+  useEffect(() => {
+    setFit(parseFit(search.get("fit")));
+  }, [search]);
 
   const items = useMemo(() => {
     return PRODUCTS.filter((p) => {
@@ -53,10 +64,14 @@ export function CatalogGrid() {
         </label>
       </div>
 
+      <p className="mt-4 text-sm text-muted-foreground">
+        {items.length} modèle{items.length > 1 ? "s" : ""}
+      </p>
+
       {items.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">{t("filter.empty")}</div>
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
           {items.map((p) => (
             <ProductCard key={p.slug} product={p} />
           ))}

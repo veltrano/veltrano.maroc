@@ -1,65 +1,55 @@
 # Veltrano
 
-Boutique jeans (baggy et straight fit), **français + arabe** : 12 modèles, **250 MAD** l’unité, **400 MAD** le pack de 2.
+Boutique denim (baggy et coupe droite), **français + arabe** : 12 jeans homme, **250 MAD** l’unité, **400 MAD** le pack de 2.
 
-Sélecteur **FR | ع** à côté du panier. Langue auto (`ar*` → arabe, sinon français). L’arabe est RTL. Veltrano, MAD/DH et noms catalogue inchangés.
+- Livraison **gratuite au Maroc** (0 MAD)
+- **Échange de taille gratuit** demandé sous 7 jours après réception
+- Copy produit complète, guides des tailles par coupe, SEO + JSON-LD
+- Hero vidéo desktop/mobile (assets owner Drive)
 
-Les descriptions du catalogue sont vides — l’app n’invente pas de copy produit au-delà des champs fournis (nom, prix, pack, couleur, tailles, stock, dossier Drive).
+Sélecteur **FR | ع** à côté du panier. Veltrano, MAD/DH et noms de coloris catalogue inchangés.
 
 ## Lancer en local
 
 ```bash
 npm install
-npm run sync-images   # copie les photos Drive si le worker d’ingest les a déjà déposées
+npm run sync-images   # photos produit si besoin
 npm run dev
 ```
 
 Ouvre [http://localhost:43127](http://localhost:43127).
 
-Build de prod : `npm run build` puis `npm start` (écoute `PORT`, défaut 43127).
+Build : `npm run build` puis `npm start` (port `PORT`, défaut 43127).
 
-## EasyPanel (VPS)
+## Médias owner (configuration)
 
-Cibles : domaine **https://veltrano.ma** (et www), repo **https://github.com/veltrano/veltrano.maroc.git**, panel **http://187.6.164.52:3000/** projet **veltrano**.
+| Slot | Fichier local | Source Drive |
+| --- | --- | --- |
+| Hero desktop | `public/heroes/hero-laptop.mp4` (+ poster) | dossier « hero for laptop » |
+| Hero mobile | `public/heroes/hero-phone.mp4` (+ poster) | dossier « hero for phone » |
+| Guide baggy | `public/size-guides/baggy-size-guide.png` | dossier « baggy size guide » |
+| Guide coupe droite | `public/size-guides/straight-fit-size-guide.png` | dossier « straight fit size guide » |
 
-1. App EasyPanel from GitHub, builder **Dockerfile** (racine).
-2. Port conteneur **3000** (`PORT` / `HOST` EasyPanel → `HOSTNAME` dans l’entrypoint).
-3. Volume persistant : `/app/data/store` + env `DATA_DIR=/app/data/store` (JSON commandes / coupons / file WhatsApp).
-4. **Ne monte pas de volume sur `/app/public/products`.** Les JPEG boutique (~33MB, `01.jpg` = plat face avant) sont dans l’image Docker. Un volume vide masquerait toutes les photos. Volume persistant uniquement pour `/app/data/store`.
-5. Env à coller depuis `.env.example` :
-   - `NEXT_PUBLIC_SITE_URL=https://veltrano.ma`
-   - `SITE_URL=https://veltrano.ma`
-   - `CORS_ORIGINS=https://veltrano.ma,https://www.veltrano.ma`
-   - `ADMIN_SECRET`, WhatsApp Meta ou Twilio
-   - `DATABASE_URL` : **optionnel**. Le service Postgres `veltrano-db` existe ; l’app n’y écrit pas tant qu’il n’y a pas de migration. Les commandes restent dans le volume JSON.
-6. Start : `node server.js` (standalone). Pas de start npm si le builder est Docker.
+Mapping code : `src/data/media-assets.ts`. Remplacer un fichier local suffit pour mettre à jour le site.
 
-Le CORS des routes `/api` n’accepte que veltrano.ma, www, et le preview local.
+## Contenu & règles métier
 
-`docker compose up --build` en local utilise le volume `veltrano-orders`.
+- Catalogue / copy : `src/data/catalog.ts`, `src/data/product-content.ts`
+- Guides tailles (image + tableau) : `src/data/size-guides.ts`
+- Livraison 0 MAD : `src/data/shipping.ts` (+ champ `shippingMad` commande)
+- Avis : `src/data/reviews.ts` (fixtures démo `isDemo` exclues en production)
+- Politique : `/aide/livraison-retours`
 
-Lifestyle + films clients sont dans git (`public/lifestyle`, `public/videos`). Photos produit : JPEG compressés (`01.jpg` = plat **face avant**), les PNG Drive restent hors git.
+## EasyPanel / prod
 
-## Photos produit
+Domaine cible **https://veltrano.ma**. Voir `docs/easypanel-deploy.md` et `.env.example`.
 
-Les photos Drive (116 fichiers, 12 modèles) se copient ainsi :
+`NEXT_PUBLIC_SITE_URL=https://veltrano.ma` pour canonicals / sitemap. Hors domaine canonique, `robots.ts` refuse l’indexation (sauf `VELTRANO_ALLOW_INDEXING=1`).
 
-```bash
-npm run sync-images
-```
-
-Sans photos, chaque fiche affiche un placeholder teinté.
+Volume : `/app/data/store` uniquement. Photos produit JPEG dans l’image — ne pas monter un volume vide sur `/app/public/products`.
 
 ## Parcours
 
-- Accueil (lifestyle, 4 pièces, films clients), Boutique, Homme, Femme (bientôt)
-- Grille boutique, filtres coupe / couleur
-- Fiche produit : galerie, pack 1 ou 2 (tailles distinctes sur le duo), stock
-- Panier et commande enregistrée côté serveur (pas de paiement en ligne)
-- Page merci, coupon 50 DH, tableau d’équipe `/admin`
-- Popup email −10%, 5 secondes après l’arrivée
-- WhatsApp boutique : +212 777-236482. Envoi auto au client si identifiants API (voir `.env.example`)
+Accueil → Boutique / Homme / Femme (bientôt) → fiche produit (pack 1 ou 2, guide tailles) → panier → commande serveur → merci + coupon 50 DH → `/admin`.
 
-Identifiants optionnels : `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, ou Twilio `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_WHATSAPP_FROM`. Sans eux, le récapitulatif est mis en file (`data/store/whatsapp-queue.json`) et la page merci ne prétend pas qu’il a été envoyé.
-
-Catalogue source : `src/data/product-catalog.csv` (export de la Google Sheet).
+WhatsApp boutique : +212 777-236482.

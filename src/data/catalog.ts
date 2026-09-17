@@ -1,3 +1,5 @@
+import { contentForSlug, type ProductContent } from "@/data/product-content";
+
 export type Fit = "baggy" | "straight";
 
 export type Product = {
@@ -7,12 +9,15 @@ export type Product = {
   colour: string;
   colourHex: string;
   sizes: string[];
+  /** Per-size availability is not tracked; keep for future stock. Do not show raw aggregate as customer-facing stock count. */
   stock: number;
   unitPriceMad: number;
   duoPriceMad: number;
   driveFolderId: string;
   driveFolderUrl: string;
   description: string;
+  composition: string;
+  content: ProductContent;
 };
 
 export const UNIT_PRICE_MAD = 250;
@@ -113,8 +118,13 @@ export const PRODUCTS: Product[] = [
   },
 ].map((row) => {
   const fit: Fit = row.name.startsWith("baggy") ? "baggy" : "straight";
+  const slug = slugify(row.name);
+  const content = contentForSlug(slug);
+  if (!content) {
+    throw new Error(`Missing product content for ${slug}`);
+  }
   return {
-    slug: slugify(row.name),
+    slug,
     name: row.name,
     fit,
     colour: row.colour,
@@ -125,7 +135,9 @@ export const PRODUCTS: Product[] = [
     duoPriceMad: DUO_PRICE_MAD,
     driveFolderId: row.driveFolderId,
     driveFolderUrl: `https://drive.google.com/drive/folders/${row.driveFolderId}?usp=sharing`,
-    description: "",
+    description: content.shortDescription,
+    composition: content.composition,
+    content,
   };
 });
 
@@ -144,13 +156,25 @@ export function productBySlug(slug: string) {
 }
 
 export function displayName(product: Product) {
-  return `${fitLabel(product.fit)} · ${product.colour}`;
+  return product.content.title;
+}
+
+export function productsByFit(fit: Fit) {
+  return PRODUCTS.filter((p) => p.fit === fit);
 }
 
 export function packPrice(quantity: number) {
   const duos = Math.floor(quantity / 2);
   const singles = quantity % 2;
   return duos * DUO_PRICE_MAD + singles * UNIT_PRICE_MAD;
+}
+
+export function duoSavingsMad() {
+  return UNIT_PRICE_MAD * 2 - DUO_PRICE_MAD;
+}
+
+export function duoPerJeanMad() {
+  return DUO_PRICE_MAD / 2;
 }
 
 export function mad(amount: number) {

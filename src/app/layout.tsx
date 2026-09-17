@@ -28,9 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return {
     metadataBase: new URL(siteUrl()),
-    title: t(locale, "meta.title"),
+    title: {
+      default: t(locale, "meta.title"),
+      template: "%s",
+    },
     description: t(locale, "meta.description"),
-    alternates: { canonical: "/" },
   };
 }
 

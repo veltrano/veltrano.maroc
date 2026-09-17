@@ -110,8 +110,16 @@ export function cartDiscount(lines: CartLine[], couponCode?: string | null) {
   return COUPON_VALUE_MAD;
 }
 
+export function cartShipping(_lines?: CartLine[]) {
+  // Free shipping for supported Moroccan orders — authoritative rule.
+  return 0;
+}
+
 export function cartTotal(lines: CartLine[], couponCode?: string | null) {
-  return Math.max(0, cartSubtotal(lines) - cartDiscount(lines, couponCode));
+  return Math.max(
+    0,
+    cartSubtotal(lines) - cartDiscount(lines, couponCode) + cartShipping(lines)
+  );
 }
 
 export function cartUnitCount(lines: CartLine[]) {
