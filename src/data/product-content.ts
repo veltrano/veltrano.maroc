@@ -271,3 +271,11 @@ export const SERVICE_LINE_MOBILE = [
   "Livraison gratuite au Maroc",
   "Échange de taille gratuit sous 7 jours après réception",
 ] as const;
+
+export const SERVICE_LINE_AR =
+  "توصيل مجاني داخل المغرب · استبدال المقاس مجانًا عند تقديم الطلب خلال 7 أيام من الاستلام";
+
+export const SERVICE_LINE_MOBILE_AR = [
+  "توصيل مجاني داخل المغرب",
+  "استبدال المقاس مجانًا عند تقديم الطلب خلال 7 أيام من الاستلام",
+] as const;
