@@ -33,14 +33,14 @@ export const MEDIA_ASSETS: Record<MediaAssetSlot, MediaAssetRecord> = {
     driveFolderUrl:
       "https://drive.google.com/drive/folders/1U6-LQ7mRJVZI2HFUD5yGRy5oOuE4wand?usp=sharing",
     driveFolderTitle: "hero for laptop",
-    driveFileId: "1Qdj4wt18hAVrz65rc5Se_HD4cNOprwFY",
+    driveFileId: "14NLxNH89kchTxImZx869xWMdjlxMCQ2d",
     driveOriginalName: "EBF12FB2-08D9-4C01-A26E-C1ACB47F79C6.MP4",
     mimeType: "video/mp4",
     localPath: "/heroes/hero-laptop.mp4",
     posterPath: "/heroes/hero-laptop-poster.jpg",
     retrieved: true,
     verified: true,
-    notes: "1920×1080, ~10s, H.264",
+    notes: "1920×1080, ~8.6s, H.264 — refreshed from Drive 2026-09-17",
   },
   heroMobile: {
     slot: "heroMobile",
@@ -49,14 +49,14 @@ export const MEDIA_ASSETS: Record<MediaAssetSlot, MediaAssetRecord> = {
     driveFolderUrl:
       "https://drive.google.com/drive/folders/1Z03U_EtznDXJv7crx5eug84CbT0WWBr3?usp=sharing",
     driveFolderTitle: "hero for phone",
-    driveFileId: "1rrLgYNSRf19mIpoUWoitzVDPJNL-AdxU",
+    driveFileId: "1cA-5MpNsm_wNT7PEAJIXyPodgBsHTW08",
     driveOriginalName: "IMG_1872.MP4 Comp 1_1.MP4",
     mimeType: "video/mp4",
     localPath: "/heroes/hero-phone.mp4",
     posterPath: "/heroes/hero-phone-poster.jpg",
     retrieved: true,
     verified: true,
-    notes: "1080×1920, ~10s, H.264",
+    notes: "1080×1920, ~8.5s, H.264 — refreshed from Drive 2026-09-17",
   },
   sizeGuideBaggy: {
     slot: "sizeGuideBaggy",
