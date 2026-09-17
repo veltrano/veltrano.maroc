@@ -71,8 +71,8 @@ export const messages = {
       "La collection Femme n’est pas encore disponible à l’achat. Laissez votre email pour être informée du lancement.",
 
     "fit.all": "Toutes les coupes",
-    "fit.baggy": "باجي",
-    "fit.straight": "قصّة مستقيمة",
+    "fit.baggy": "Baggy",
+    "fit.straight": "Coupe droite",
     "filter.colour": "Couleur",
     "filter.allColours": "Toutes",
     "filter.empty": "Aucun jean pour ce filtre. Réinitialise la coupe ou la couleur.",
@@ -368,8 +368,8 @@ export const messages = {
       "قريباً. القصة، الغسيل، الحضور — بنسختها. نحضّر الخط. سجّل أعلاه للجديد و−10%.",
 
     "fit.all": "كل القصات",
-    "fit.baggy": "Baggy",
-    "fit.straight": "Coupe droite",
+    "fit.baggy": "باجي",
+    "fit.straight": "قصّة مستقيمة",
     "filter.colour": "اللون",
     "filter.allColours": "الكل",
     "filter.empty": "لا يوجد جينز لهذا التصفية. أعد ضبط القصة أو اللون.",

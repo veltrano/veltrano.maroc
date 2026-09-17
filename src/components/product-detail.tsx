@@ -157,7 +157,9 @@ export function ProductDetail({ product }: { product: Product }) {
               {product.fit === "baggy" ? t("fit.baggy") : t("fit.straight")}
               {product.fit === "straight" && locale === "fr" ? " · Straight fit" : null}
             </p>
-            <h1 className="font-heading mt-1 text-3xl sm:text-4xl">{content.h1}</h1>
+            <h1 className="arabic-product-title font-heading mt-1 text-3xl sm:text-4xl">
+              {content.h1}
+            </h1>
             <p className="mt-3 text-lg font-medium">{mad(total)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {t('product.packPrice', { unit: mad(product.unitPriceMad), duo: mad(product.duoPriceMad) })}
