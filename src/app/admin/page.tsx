@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   Boxes,
+  CalendarClock,
   CheckCircle2,
   ChevronDown,
   CircleDollarSign,
@@ -13,6 +14,7 @@ import {
   LayoutDashboard,
   Loader2,
   MessageCircle,
+  MailPlus,
   Package,
   RefreshCw,
   Search,
@@ -46,6 +48,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  ClientsCrm,
+  EmailSignupsAdmin,
+  FollowUpQueue,
+} from "@/components/admin-crm";
 
 type AdminProduct = {
   slug: string;
@@ -76,8 +83,10 @@ type Section =
   | "overview"
   | "orders"
   | "customers"
+  | "followup"
   | "products"
   | "coupons"
+  | "email-signups"
   | "automations";
 
 const confirmationOptions: {
@@ -98,6 +107,7 @@ const shipmentOptions: { value: ShipmentStatus; label: string }[] = [
   { value: "delivered", label: "Livrée" },
   { value: "failed_attempt", label: "Échec livraison" },
   { value: "returned", label: "Retournée" },
+  { value: "cancelled", label: "Annulée" },
 ];
 
 const paymentOptions: { value: PaymentStatus; label: string }[] = [
@@ -115,8 +125,10 @@ const navigation: {
   { id: "overview", label: "Vue d’ensemble", icon: LayoutDashboard, group: "Opérations" },
   { id: "orders", label: "Commandes", icon: ClipboardList, group: "Opérations" },
   { id: "customers", label: "Clients CRM", icon: Users, group: "Opérations" },
+  { id: "followup", label: "Suivi", icon: CalendarClock, group: "Opérations" },
   { id: "products", label: "Produits & stock", icon: Boxes, group: "Opérations" },
   { id: "coupons", label: "Coupons", icon: Gift, group: "Croissance" },
+  { id: "email-signups", label: "Inscriptions e-mail & coupons 10 %", icon: MailPlus, group: "Croissance" },
   { id: "automations", label: "Automatisations", icon: Settings2, group: "Administration" },
 ];
 
@@ -340,29 +352,6 @@ export default function AdminPage() {
     });
   }, [orders, orderFilter, query]);
 
-  const customers = useMemo(() => {
-    const byPhone = new Map<
-      string,
-      { name: string; phone: string; city: string; orders: Order[] }
-    >();
-    orders.forEach((order) => {
-      const phone = order.phone.replace(/\s+/g, "");
-      const current = byPhone.get(phone) ?? {
-        name: order.name,
-        phone: order.phone,
-        city: order.city,
-        orders: [],
-      };
-      current.orders.push(order);
-      byPhone.set(phone, current);
-    });
-    return [...byPhone.values()].sort(
-      (a, b) =>
-        new Date(b.orders[0].createdAt).getTime() -
-        new Date(a.orders[0].createdAt).getTime()
-    );
-  }, [orders]);
-
   if (needsKey) {
     return (
       <div className="min-h-[75vh] bg-[#f6f7f8] px-4 py-16">
@@ -545,8 +534,9 @@ export default function AdminPage() {
               />
             ) : null}
             {section === "customers" ? (
-              <Customers customers={customers} />
+              <ClientsCrm />
             ) : null}
+            {section === "followup" ? <FollowUpQueue /> : null}
             {section === "products" && data ? (
               <Products products={data.products} orders={orders} />
             ) : null}
@@ -563,6 +553,7 @@ export default function AdminPage() {
                 }
               />
             ) : null}
+            {section === "email-signups" ? <EmailSignupsAdmin /> : null}
             {section === "automations" && data ? (
               <Automations data={data} />
             ) : null}
@@ -1015,77 +1006,6 @@ function OrderCard({
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function Customers({
-  customers,
-}: {
-  customers: {
-    name: string;
-    phone: string;
-    city: string;
-    orders: Order[];
-  }[];
-}) {
-  return (
-    <Card className="bg-white">
-      <CardHeader>
-        <CardTitle>Clients identifiés</CardTitle>
-        <CardDescription>
-          Regroupés par téléphone fourni dans les commandes.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="overflow-x-auto">
-        {customers.length ? (
-          <table className="w-full min-w-[680px] text-sm">
-            <thead>
-              <tr className="border-b text-start text-[11px] uppercase tracking-wider text-muted-foreground">
-                <th className="pb-3 text-start font-medium">Client</th>
-                <th className="pb-3 text-start font-medium">Ville</th>
-                <th className="pb-3 text-start font-medium">Commandes</th>
-                <th className="pb-3 text-start font-medium">Valeur totale</th>
-                <th className="pb-3 text-start font-medium">Dernière commande</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#eceef0]">
-              {customers.map((customer) => (
-                <tr key={customer.phone}>
-                  <td className="py-4">
-                    <p className="font-medium">{customer.name}</p>
-                    <a
-                      href={`tel:${customer.phone}`}
-                      className="text-xs text-muted-foreground hover:underline"
-                    >
-                      {customer.phone}
-                    </a>
-                  </td>
-                  <td className="py-4">{customer.city}</td>
-                  <td className="py-4">{customer.orders.length}</td>
-                  <td className="py-4 font-medium">
-                    {mad(
-                      customer.orders.reduce(
-                        (sum, order) => sum + order.totalMad,
-                        0
-                      )
-                    )}
-                  </td>
-                  <td className="py-4 text-muted-foreground">
-                    {new Date(customer.orders[0].createdAt).toLocaleDateString(
-                      "fr-MA"
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="py-10 text-center text-muted-foreground">
-            Les clients apparaîtront après leur première commande.
-          </p>
-        )}
       </CardContent>
     </Card>
   );

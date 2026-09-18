@@ -14,12 +14,19 @@ import { parseLocale } from "@/lib/i18n/locale";
 import { redeemableCoupon } from "@/lib/coupon-redeem";
 import { mutateStore } from "@/lib/store";
 import { deliverOrderWhatsApp } from "@/lib/whatsapp-send";
+import {
+  newId,
+  normalizeEmail,
+  normalizePhone,
+  type ClientProfile,
+} from "@/lib/crm";
 
 export async function POST(req: Request) {
   const locale = localeFromRequest(req);
   let body: {
     name?: string;
     phone?: string;
+    email?: string;
     city?: string;
     address?: string;
     notes?: string;
@@ -36,6 +43,7 @@ export async function POST(req: Request) {
   const orderLocale = parseLocale(body.locale) ?? locale;
   const name = String(body.name ?? "").trim();
   const phone = String(body.phone ?? "").trim();
+  const email = normalizeEmail(body.email);
   const city = String(body.city ?? "").trim();
   const address = String(body.address ?? "").trim();
   const notes = String(body.notes ?? "").trim();
@@ -56,10 +64,22 @@ export async function POST(req: Request) {
   }
 
   const created = await mutateStore((data) => {
-    const code = String(body.coupon ?? "").trim();
+    const code = String(body.coupon ?? "").trim().toUpperCase();
+    const fixedResult = code
+      ? redeemableCoupon(data.coupons, data.orders, code)
+      : null;
+    const welcomeSignup = code
+      ? data.emailSignups.find(
+          (signup) =>
+            signup.couponCode === code &&
+            signup.couponStatus === "active" &&
+            new Date(signup.expiresAt).getTime() > Date.now()
+        )
+      : undefined;
     if (code) {
-      const result = redeemableCoupon(data.coupons, data.orders, code);
-      if (!result.ok) return { error: couponMessage(orderLocale, result.code) };
+      if (fixedResult && !fixedResult.ok && !welcomeSignup) {
+        return { error: couponMessage(orderLocale, fixedResult.code) };
+      }
     }
 
     const id = `VT-${Date.now().toString(36).toUpperCase()}`;
@@ -67,13 +87,25 @@ export async function POST(req: Request) {
     let discountMad = 0;
     let appliedCoupon: string | undefined;
     if (code) {
-      const result = redeemableCoupon(data.coupons, data.orders, code);
-      if (!result.ok) return { error: couponMessage(orderLocale, result.code) };
-      if (subtotalMad > 0) {
-        discountMad = result.coupon.amountMad;
-        appliedCoupon = result.coupon.code;
-        result.coupon.usedAt = new Date().toISOString();
-        result.coupon.usedOnOrderId = id;
+      if (welcomeSignup) {
+        discountMad = Math.round(subtotalMad * 0.1);
+        appliedCoupon = welcomeSignup.couponCode;
+        welcomeSignup.couponStatus = "used";
+        welcomeSignup.linkedOrderId = id;
+        welcomeSignup.updatedAt = new Date().toISOString();
+        data.welcomeCouponEvents.unshift({
+          id: newId("WCE"),
+          signupId: welcomeSignup.id,
+          fromStatus: "active",
+          toStatus: "used",
+          reason: `Utilisé sur ${id}`,
+          createdAt: new Date().toISOString(),
+        });
+      } else if (fixedResult?.ok && subtotalMad > 0) {
+        discountMad = fixedResult.coupon.amountMad;
+        appliedCoupon = fixedResult.coupon.code;
+        fixedResult.coupon.usedAt = new Date().toISOString();
+        fixedResult.coupon.usedOnOrderId = id;
       }
     }
     const used = new Set(data.coupons.map((c) => c.code));
@@ -90,6 +122,7 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
       name,
       phone,
+      email: email || undefined,
       city,
       address,
       notes,
@@ -108,6 +141,51 @@ export async function POST(req: Request) {
       updatedAt: new Date().toISOString(),
     };
     data.orders = [order, ...data.orders];
+
+    const normalizedPhone = normalizePhone(phone);
+    let client =
+      (email
+        ? data.clients.find((item) => item.emailNormalized === email)
+        : undefined) ??
+      data.clients.find((item) => item.phoneNormalized === normalizedPhone);
+    if (!client) {
+      const stamp = new Date().toISOString();
+      client = {
+        id: newId("CL"),
+        name,
+        phone,
+        phoneNormalized: normalizedPhone,
+        email: email || undefined,
+        emailNormalized: email || undefined,
+        city,
+        deliveryAddress: address,
+        preferredLanguage: orderLocale,
+        source: "site_web",
+        notes: "",
+        contactStatus: "a_contacter",
+        marketingEmail: false,
+        marketingWhatsApp: false,
+        createdAt: stamp,
+        updatedAt: stamp,
+      } satisfies ClientProfile;
+      data.clients.unshift(client);
+    } else {
+      client.name = name;
+      client.phone = phone;
+      client.phoneNormalized = normalizedPhone;
+      if (email) {
+        client.email = email;
+        client.emailNormalized = email;
+      }
+      client.city = city;
+      client.deliveryAddress = address;
+      client.updatedAt = new Date().toISOString();
+    }
+    data.orderClientLinks.push({
+      orderId: id,
+      clientId: client.id,
+      linkedAt: new Date().toISOString(),
+    });
     return { order };
   });
 

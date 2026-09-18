@@ -49,11 +49,16 @@ Domaine cible **https://veltrano.ma**. Voir `docs/easypanel-deploy.md` et `.env.
 Volume : `/app/data/store` uniquement. Photos produit JPEG dans l’image — ne pas monter un volume vide sur `/app/public/products`.
 
 1. App EasyPanel depuis GitHub, builder **Dockerfile** à la racine.
-2. Port conteneur **3000**.
+2. Port conteneur **3000** (`PORT` / `HOST` EasyPanel → `HOSTNAME` dans l’entrypoint).
 3. Volume persistant : `/app/data/store` avec `DATA_DIR=/app/data/store`.
-4. Configurer `NEXT_PUBLIC_SITE_URL`, `SITE_URL`, `CORS_ORIGINS` et un
-   `ADMIN_SECRET` obligatoire en production.
-5. Démarrage standalone : `node server.js`.
+4. **Ne monte pas de volume sur `/app/public/products`.** Les JPEG boutique sont dans l’image Docker.
+5. Configurer depuis `.env.example` :
+   - `NEXT_PUBLIC_SITE_URL=https://veltrano.ma`
+   - `SITE_URL=https://veltrano.ma`
+   - `CORS_ORIGINS=https://veltrano.ma,https://www.veltrano.ma`
+   - `ADMIN_SECRET` obligatoire en production
+   - `DATABASE_URL` : Postgres EasyPanel `veltrano-db`. Le démarrage applique les migrations et importe les anciens JSON sans écraser les données déjà migrées.
+6. Démarrage standalone : `node server.js`.
 
 ## Parcours
 
@@ -72,3 +77,16 @@ enregistrées : vue d’ensemble, file de confirmation, statuts séparés de com
 paiement, notes internes, CRM dérivé des commandes, catalogue/stock visible, création de coupons
 et état des intégrations. Les visiteurs et ventes livrées ne sont jamais inventés lorsqu’aucune
 source ou aucun statut réel n’existe.
+
+Le CRM étendu ajoute les profils clients/leads, détection de doublons téléphone/e-mail, file de
+suivi, historique client, listes calculées/épinglées et inscriptions popup avec coupons 10 %.
+Les migrations sont dans `migrations/`; commandes utiles :
+
+```bash
+npm run db:migrate
+npm run db:backfill
+npm run db:seed # données de démonstration facultatives, idempotentes
+npm test
+```
+
+Sans `DATABASE_URL`, le développement local conserve un fallback JSON dans `data/store`.

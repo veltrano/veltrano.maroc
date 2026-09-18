@@ -104,9 +104,12 @@ export function cartSubtotal(lines: CartLine[]) {
 export function cartDiscount(lines: CartLine[], couponCode?: string | null) {
   if (!couponCode) return 0;
   if (typeof window === "undefined") return 0;
-  if (!unusedCoupon(couponCode)) return 0;
-  if (cartSubtotal(lines) <= 0) return 0;
-  return COUPON_VALUE_MAD;
+  const coupon = unusedCoupon(couponCode);
+  if (!coupon) return 0;
+  const subtotal = cartSubtotal(lines);
+  if (subtotal <= 0) return 0;
+  if (coupon.percent) return Math.round(subtotal * (coupon.percent / 100));
+  return coupon.amountMad ?? COUPON_VALUE_MAD;
 }
 
 export function cartShipping(_lines?: CartLine[]) {

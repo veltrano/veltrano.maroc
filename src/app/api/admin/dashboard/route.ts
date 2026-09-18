@@ -22,6 +22,7 @@ const shipmentStatuses = new Set<ShipmentStatus>([
   "delivered",
   "failed_attempt",
   "returned",
+  "cancelled",
 ]);
 const paymentStatuses = new Set<PaymentStatus>([
   "pending",
