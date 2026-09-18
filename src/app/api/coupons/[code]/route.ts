@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { couponMessage, localeFromRequest, t } from "@/lib/i18n/translate";
+import { couponMessage, localeFromRequest } from "@/lib/i18n/translate";
 import { redeemableCoupon } from "@/lib/coupon-redeem";
 import { readStore } from "@/lib/store";
 
