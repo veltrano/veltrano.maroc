@@ -383,13 +383,14 @@ async function savePostgresRows(
 export function mutateStore<T>(fn: (data: StoreFile) => T | Promise<T>): Promise<T> {
   return withLock(async () => {
     if (postgresEnabled()) {
-      return db().begin(async (tx) => {
+      const transactionResult = await db().begin(async (tx) => {
         await tx`SELECT pg_advisory_xact_lock(83927461)`;
         const data = await loadPostgres(tx);
         const result = await fn(data);
         await savePostgresRows(data, tx);
         return result;
       });
+      return transactionResult as T;
     }
     const data = await loadJson();
     const result = await fn(data);

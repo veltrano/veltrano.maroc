@@ -15,6 +15,7 @@ import { mutateStore } from "@/lib/store";
 import { sendWelcomeCouponEmail } from "@/lib/welcome-email";
 import { packPrice, productBySlug } from "@/data/catalog";
 import { generateCouponCode } from "@/lib/coupon-code";
+import type { Order } from "@/lib/order";
 
 function unauthorized() {
   return NextResponse.json({ error: "Accès refusé." }, { status: 401 });
@@ -313,7 +314,7 @@ export async function POST(req: Request) {
         orderId: id,
         createdAt: stamp,
       });
-      const order = {
+      const order: Order = {
         id,
         createdAt: stamp,
         name: client.name,

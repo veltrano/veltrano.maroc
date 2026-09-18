@@ -7,13 +7,10 @@ import {
   ArrowLeft,
   CalendarClock,
   Check,
-  Gift,
   Loader2,
   MessageCircle,
   NotebookPen,
-  Package,
   Plus,
-  RefreshCw,
   Repeat2,
   ShoppingBag,
 } from "lucide-react";
@@ -35,7 +32,6 @@ import {
 import { linePrice } from "@/lib/order";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -163,7 +159,7 @@ export default function ClientProfilePage() {
       </div>
     );
   }
-  if (!client) {
+  if (!data || !client) {
     return (
       <div className="min-h-[70vh] bg-[#f6f7f8] px-4 py-20 text-center">
         <h1 className="font-heading text-3xl">Client introuvable</h1>

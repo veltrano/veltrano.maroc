@@ -5,19 +5,15 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   CalendarClock,
-  Check,
   ChevronDown,
   Filter,
   Loader2,
   Mail,
-  Phone,
   Plus,
   RefreshCw,
   Search,
-  UserRound,
-  X,
 } from "lucide-react";
-import { mad, productBySlug } from "@/data/catalog";
+import { mad } from "@/data/catalog";
 import {
   computedListMembership,
   customerMatchesOrderOutcome,
@@ -26,7 +22,6 @@ import {
   latestOrder,
   SAVED_LIST_KEYS,
   type ClientProfile,
-  type ClientSource,
   type ContactOutcome,
   type SavedListKey,
 } from "@/lib/crm";
@@ -41,7 +36,6 @@ import {
 } from "@/lib/admin-crm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
