@@ -38,7 +38,8 @@ function order(
   };
 }
 
-await mutateStore((data) => {
+async function main() {
+  await mutateStore((data) => {
   const clients: ClientProfile[] = [
     {
       id: "CL-DEMO-REPEAT",
@@ -213,6 +214,12 @@ await mutateStore((data) => {
       data.emailSignups.push(signup);
     }
   });
-});
+  });
 
-console.log("Données CRM de démonstration ajoutées sans écraser les données existantes.");
+  console.log("Données CRM de démonstration ajoutées sans écraser les données existantes.");
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
