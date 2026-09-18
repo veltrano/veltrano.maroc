@@ -244,6 +244,8 @@ export default function AdminPage() {
     const saved = sessionStorage.getItem("veltrano:admin-secret") ?? "";
     setKey(saved);
     load(saved || undefined);
+    // Initial authorization check only; subsequent refreshes are explicit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function updateOrder(
@@ -295,7 +297,7 @@ export default function AdminPage() {
     load(key.trim());
   }
 
-  const orders = data?.orders ?? [];
+  const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
   const metrics = useMemo(() => {
     const today = orders.filter((order) => sameCasablancaDay(order.createdAt));
     const awaiting = orders.filter((order) =>

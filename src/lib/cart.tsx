@@ -11,7 +11,6 @@ import type { Product } from "@/data/catalog";
 import { productBySlug } from "@/data/catalog";
 import {
   COUPON_VALUE_MAD,
-  getAppliedCode,
   setAppliedCode,
   unusedCoupon,
 } from "@/lib/coupons";
