@@ -99,6 +99,10 @@ export async function POST(req: Request) {
       rewardCoupon: reward.code,
       whatsapp: { status: "queued" },
       locale: orderLocale,
+      confirmationStatus: "new",
+      shipmentStatus: "unfulfilled",
+      paymentStatus: "pending",
+      updatedAt: new Date().toISOString(),
     };
     data.orders = [order, ...data.orders];
     return { order };

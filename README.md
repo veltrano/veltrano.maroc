@@ -30,7 +30,7 @@ Cibles : domaine **https://veltrano.ma** (et www), repo **https://github.com/vel
    - `NEXT_PUBLIC_SITE_URL=https://veltrano.ma`
    - `SITE_URL=https://veltrano.ma`
    - `CORS_ORIGINS=https://veltrano.ma,https://www.veltrano.ma`
-   - `ADMIN_SECRET`, WhatsApp Meta ou Twilio
+   - `ADMIN_SECRET` (**requis en production**), WhatsApp Meta ou Twilio
    - `DATABASE_URL` : **optionnel**. Le service Postgres `veltrano-db` existe ; l’app n’y écrit pas tant qu’il n’y a pas de migration. Les commandes restent dans le volume JSON.
 6. Start : `node server.js` (standalone). Pas de start npm si le builder est Docker.
 
@@ -63,3 +63,11 @@ Sans photos, chaque fiche affiche un placeholder teinté.
 Identifiants optionnels : `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, ou Twilio `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_WHATSAPP_FROM`. Sans eux, le récapitulatif est mis en file (`data/store/whatsapp-queue.json`) et la page merci ne prétend pas qu’il a été envoyé.
 
 Catalogue source : `src/data/product-catalog.csv` (export de la Google Sheet).
+
+## Dashboard admin
+
+Ouvre `/admin`. La première version opérationnelle utilise uniquement les données réellement
+enregistrées : vue d’ensemble, file de confirmation, statuts séparés de commande/livraison/
+paiement, notes internes, CRM dérivé des commandes, catalogue/stock visible, création de coupons
+et état des intégrations. Les visiteurs et ventes livrées ne sont jamais inventés lorsqu’aucune
+source ou aucun statut réel n’existe.

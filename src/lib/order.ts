@@ -17,6 +17,23 @@ export type WhatsAppDelivery = {
   error?: string;
 };
 
+export type ConfirmationStatus =
+  | "new"
+  | "awaiting_confirmation"
+  | "confirmed"
+  | "cancelled";
+
+export type ShipmentStatus =
+  | "unfulfilled"
+  | "prepared"
+  | "dispatched"
+  | "out_for_delivery"
+  | "delivered"
+  | "failed_attempt"
+  | "returned";
+
+export type PaymentStatus = "pending" | "collected" | "refunded";
+
 export type Order = {
   id: string;
   createdAt: string;
@@ -33,6 +50,11 @@ export type Order = {
   rewardCoupon: string;
   whatsapp: WhatsAppDelivery;
   locale?: "fr" | "ar";
+  confirmationStatus?: ConfirmationStatus;
+  shipmentStatus?: ShipmentStatus;
+  paymentStatus?: PaymentStatus;
+  updatedAt?: string;
+  internalNotes?: string;
 };
 
 export type WhatsAppQueueItem = {
