@@ -113,6 +113,7 @@ export function cartDiscount(lines: CartLine[], couponCode?: string | null) {
 }
 
 export function cartShipping(_lines?: CartLine[]) {
+  void _lines;
   // Free shipping for supported Moroccan orders — authoritative rule.
   return 0;
 }
