@@ -59,7 +59,10 @@ export async function GET(req: Request) {
             process.env.TWILIO_AUTH_TOKEN &&
             process.env.TWILIO_WHATSAPP_FROM)
       ),
-      gmail: Boolean(process.env.GMAIL_CLIENT_ID),
+      gmail: Boolean(
+        process.env.GMAIL_CLIENT_ID ||
+          (process.env.GMAIL_ACCESS_TOKEN && process.env.GMAIL_SENDER)
+      ),
       googleSheets: Boolean(
         process.env.GOOGLE_SHEETS_ID && process.env.GOOGLE_SERVICE_ACCOUNT_JSON
       ),
