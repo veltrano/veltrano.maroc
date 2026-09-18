@@ -9,6 +9,7 @@ export type Coupon = {
   createdAt: string;
   usedAt?: string;
   usedOnOrderId?: string;
+  percent?: number;
 };
 
 const KEY = "veltrano:coupons";
@@ -58,7 +59,11 @@ export function saveIssuedCoupon(code: string, orderId: string, amountMad = COUP
   ]);
 }
 
-export function rememberValidCoupon(code: string, amountMad = COUPON_VALUE_MAD) {
+export function rememberValidCoupon(
+  code: string,
+  amountMad = COUPON_VALUE_MAD,
+  percent?: number
+) {
   const n = code.trim().toUpperCase();
   const existing = findCoupon(n);
   if (existing?.usedAt || existing?.usedOnOrderId) {
@@ -67,6 +72,14 @@ export function rememberValidCoupon(code: string, amountMad = COUPON_VALUE_MAD) 
   }
   if (!unusedCoupon(n)) {
     saveIssuedCoupon(n, "remote", amountMad);
+  }
+  if (percent) {
+    const list = readCoupons();
+    writeCoupons(
+      list.map((coupon) =>
+        coupon.code === n ? { ...coupon, percent } : coupon
+      )
+    );
   }
   setAppliedCode(n);
 }
@@ -130,11 +143,16 @@ export async function applyCouponRemote(raw: string) {
       ok?: boolean;
       code?: string;
       amountMad?: number;
+      percent?: number;
       error?: string;
       used?: boolean;
     };
     if (res.ok && json.ok && json.code) {
-      rememberValidCoupon(json.code, json.amountMad ?? COUPON_VALUE_MAD);
+      rememberValidCoupon(
+        json.code,
+        json.amountMad ?? COUPON_VALUE_MAD,
+        json.percent
+      );
       return { ok: true as const, code: json.code };
     }
     if (json.used || json.error) {

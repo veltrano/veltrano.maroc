@@ -61,6 +61,7 @@ export default function CheckoutPage() {
     const data = new FormData(e.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
     const city = String(data.get("city") ?? "").trim();
     const address = String(data.get("address") ?? "").trim();
     const notes = String(data.get("notes") ?? "").trim();
@@ -84,6 +85,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           name,
           phone,
+          email,
           city,
           address,
           notes,
@@ -134,6 +136,10 @@ export default function CheckoutPage() {
         <div className="space-y-2">
           <Label htmlFor="phone">{t("checkout.phone")}</Label>
           <Input id="phone" name="phone" required inputMode="tel" className="h-10" placeholder={t("checkout.phonePh")} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">{t("checkout.email")}</Label>
+          <Input id="email" name="email" type="email" className="h-10" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="city">{t("checkout.city")}</Label>

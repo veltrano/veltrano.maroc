@@ -30,7 +30,8 @@ export type ShipmentStatus =
   | "out_for_delivery"
   | "delivered"
   | "failed_attempt"
-  | "returned";
+  | "returned"
+  | "cancelled";
 
 export type PaymentStatus = "pending" | "collected" | "refunded";
 
@@ -39,6 +40,7 @@ export type Order = {
   createdAt: string;
   name: string;
   phone: string;
+  email?: string;
   city: string;
   address: string;
   notes: string;
@@ -50,6 +52,7 @@ export type Order = {
   rewardCoupon: string;
   whatsapp: WhatsAppDelivery;
   locale?: "fr" | "ar";
+  source?: "site_web" | "whatsapp" | "instagram" | "telephone" | "manuel";
   confirmationStatus?: ConfirmationStatus;
   shipmentStatus?: ShipmentStatus;
   paymentStatus?: PaymentStatus;

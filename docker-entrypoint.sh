@@ -11,6 +11,10 @@ mkdir -p "$DATA_DIR" /app/public/products
 if [ -d /opt/veltrano-catalog ] && [ -z "$(find /app/public/products -name '*.jpg' -print -quit 2>/dev/null)" ]; then
   cp -a /opt/veltrano-catalog/. /app/public/products/
 fi
+if [ -n "${DATABASE_URL:-}" ]; then
+  node /app/scripts/migrate.mjs
+  node /app/scripts/backfill-json.mjs
+fi
 if [ "$(id -u)" = "0" ]; then
   chown -R nextjs:nodejs "$DATA_DIR" /app/public/products 2>/dev/null || true
   exec su-exec nextjs node server.js

@@ -33,6 +33,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/public/products /opt/veltrano-catalog
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/scripts/migrate.mjs /app/scripts/backfill-json.mjs ./scripts/
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod 755 /app/docker-entrypoint.sh \
   && mkdir -p /app/data/store /app/public/products \

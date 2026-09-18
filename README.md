@@ -31,7 +31,7 @@ Cibles : domaine **https://veltrano.ma** (et www), repo **https://github.com/vel
    - `SITE_URL=https://veltrano.ma`
    - `CORS_ORIGINS=https://veltrano.ma,https://www.veltrano.ma`
    - `ADMIN_SECRET` (**requis en production**), WhatsApp Meta ou Twilio
-   - `DATABASE_URL` : **optionnel**. Le service Postgres `veltrano-db` existe ; l’app n’y écrit pas tant qu’il n’y a pas de migration. Les commandes restent dans le volume JSON.
+   - `DATABASE_URL` : connexion au service EasyPanel Postgres `veltrano-db`. Le démarrage applique les migrations additives et importe les anciens JSON sans écraser les données déjà migrées.
 6. Start : `node server.js` (standalone). Pas de start npm si le builder est Docker.
 
 Le CORS des routes `/api` n’accepte que veltrano.ma, www, et le preview local.
@@ -71,3 +71,16 @@ enregistrées : vue d’ensemble, file de confirmation, statuts séparés de com
 paiement, notes internes, CRM dérivé des commandes, catalogue/stock visible, création de coupons
 et état des intégrations. Les visiteurs et ventes livrées ne sont jamais inventés lorsqu’aucune
 source ou aucun statut réel n’existe.
+
+Le CRM étendu ajoute les profils clients/leads, détection de doublons téléphone/e-mail, file de
+suivi, historique client, listes calculées/épinglées et inscriptions popup avec coupons 10 %.
+Les migrations sont dans `migrations/`; commandes utiles :
+
+```bash
+npm run db:migrate
+npm run db:backfill
+npm run db:seed # données de démonstration facultatives, idempotentes
+npm test
+```
+
+Sans `DATABASE_URL`, le développement local conserve un fallback JSON dans `data/store`.
