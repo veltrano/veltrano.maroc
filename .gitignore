@@ -50,3 +50,4 @@ next-env.d.ts
 # Original Drive PNGs (~720MB). Compressed JPEGs (front-flat first) are tracked.
 /public/products/**/*.png
 
+/uploads/

@@ -216,6 +216,10 @@ export default function CheckoutPage() {
               <span>−{mad(discount)}</span>
             </div>
           ) : null}
+          <div className="flex justify-between text-muted-foreground">
+            <span>{t("checkout.shipping")}</span>
+            <span>{t("checkout.shippingFree")}</span>
+          </div>
         </div>
         <p className="mt-4 text-lg font-medium">{mad(total)}</p>
       </aside>

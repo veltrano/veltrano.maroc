@@ -1,4 +1,5 @@
 import { packPrice, productBySlug } from "@/data/catalog";
+import { SHIPPING_MAD } from "@/data/shipping";
 
 export type CartLine = {
   id: string;
@@ -47,6 +48,8 @@ export type Order = {
   lines: CartLine[];
   subtotalMad: number;
   discountMad: number;
+  /** Always 0 MAD for supported Moroccan orders (owner-confirmed free shipping). */
+  shippingMad?: number;
   totalMad: number;
   appliedCoupon?: string;
   rewardCoupon: string;
@@ -59,6 +62,10 @@ export type Order = {
   updatedAt?: string;
   internalNotes?: string;
 };
+
+export function orderShippingMad() {
+  return SHIPPING_MAD;
+}
 
 export type WhatsAppQueueItem = {
   id: string;

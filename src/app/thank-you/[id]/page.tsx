@@ -110,9 +110,15 @@ export default function ThankYouPage() {
         {order.discountMad ? (
           <p className="mt-2 text-sm">{t("thanks.discount", { amount: mad(order.discountMad) })}</p>
         ) : null}
+        <p className="mt-2 text-sm text-muted-foreground">Livraison : Gratuite</p>
         <p className="mt-2 font-medium">{t("thanks.total", { amount: mad(order.totalMad) })}</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          <a href="/aide/livraison-retours" className="underline underline-offset-2">
+            Échange de taille gratuit sous 7 jours après réception
+          </a>
+        </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Link href="/boutique" className={cn(buttonVariants({ size: "lg" }), "inline-flex")}>
+          <Link href="/boutique" className={cn(buttonVariants({ size: "lg" }), "inline-flex h-12")}>
             {t("thanks.continue")}
           </Link>
         </div>

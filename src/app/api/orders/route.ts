@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { COUPON_VALUE_MAD, generateCouponCode } from "@/lib/coupon-code";
 import {
   cartSubtotal,
+  orderShippingMad,
   sanitizeLines,
   type CartLine,
   type Coupon,
@@ -115,6 +116,7 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     };
     data.coupons = [reward, ...data.coupons];
+    const shippingMad = orderShippingMad();
     const order: Order = {
       id,
       createdAt: new Date().toISOString(),
@@ -127,7 +129,8 @@ export async function POST(req: Request) {
       lines: sanitized,
       subtotalMad,
       discountMad,
-      totalMad: Math.max(0, subtotalMad - discountMad),
+      shippingMad,
+      totalMad: Math.max(0, subtotalMad - discountMad + shippingMad),
       appliedCoupon,
       rewardCoupon: reward.code,
       whatsapp: { status: "queued" },

@@ -21,7 +21,8 @@ export function SiteHeader() {
   const { lines } = useCart();
   const { t, locale } = useI18n();
   const count = cartUnitCount(lines);
-  const categoryActive = pathname === "/homme" || pathname === "/femme";
+  const categoryActive =
+    pathname === "/homme" || pathname === "/femme" || pathname === "/enfant";
   const topLinks = [
     { href: "/", label: t("nav.home") },
     { href: "/boutique", label: t("nav.shop") },
@@ -29,6 +30,7 @@ export function SiteHeader() {
   const categories = [
     { href: "/homme", label: t("nav.men") },
     { href: "/femme", label: t("nav.women") },
+    { href: "/enfant", label: t("nav.kids") },
   ];
 
   return (

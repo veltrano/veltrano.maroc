@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useI18n } from "@/lib/i18n/provider";
 import { mad } from "@/data/catalog";
+import { useI18n } from "@/lib/i18n/provider";
+import { SHOP_WHATSAPP_DISPLAY, shopWhatsAppUrl } from "@/lib/whatsapp";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -28,11 +29,29 @@ export function SiteFooter() {
           <Link href="/femme" className="hover:text-foreground">
             {t("nav.women")}
           </Link>
+          <Link href="/enfant" className="hover:text-foreground">
+            {t("nav.kids")}
+          </Link>
+          <Link href="/aide/livraison-retours" className="hover:text-foreground">
+            {t("nav.help")}
+          </Link>
+          <a
+            href={shopWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground"
+          >
+            WhatsApp {SHOP_WHATSAPP_DISPLAY}
+          </a>
         </div>
-        <div className="text-muted-foreground">
-          <p>{t("footer.delivery")}</p>
-          <p>{t("footer.exchanges")}</p>
-          <p>{t("footer.news")}</p>
+        <div className="space-y-2 text-muted-foreground">
+          <p>{t("footer.freeShip")}</p>
+          <p>
+            <Link href="/aide/livraison-retours" className="underline underline-offset-2">
+              {t("footer.exchange")}
+            </Link>
+          </p>
+          <p>{t("footer.ranges")}</p>
         </div>
       </div>
     </footer>

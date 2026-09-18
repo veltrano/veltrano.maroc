@@ -30,6 +30,7 @@ export function orderWhatsAppMessage(order: Order, locale?: Locale) {
     order.discountMad && order.discountMad > 0
       ? `\n${t(loc, "wa.discount", { amount: mad(order.discountMad) })}`
       : "";
+  const shipping = `\nLivraison : Gratuite (0 MAD)`;
 
   return `${t(loc, "wa.hello", { name: order.name })}
 
@@ -40,7 +41,7 @@ ${t(loc, "wa.name", { name: order.name })}
 ${t(loc, "wa.phone", { phone: order.phone })}
 ${t(loc, "wa.address", { address: order.address, city: order.city })}
 ${t(loc, "wa.products", { n: units })}
-${lines}${discount}
+${lines}${discount}${shipping}
 ${t(loc, "wa.total", { amount: mad(order.totalMad) })}
 ${t(loc, "wa.order", { id: order.id })}`;
 }

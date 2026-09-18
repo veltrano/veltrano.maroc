@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Noto_Sans_Arabic, Outfit } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans_Arabic, Outfit } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
 import { siteUrl } from "@/lib/site";
@@ -18,19 +18,23 @@ const fraunces = Fraunces({
   subsets: ["latin"],
 });
 
-const arabic = Noto_Sans_Arabic({
-  variable: "--font-arabic",
+const arabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-ibm-plex-arabic",
   subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return {
     metadataBase: new URL(siteUrl()),
-    title: t(locale, "meta.title"),
+    title: {
+      default: t(locale, "meta.title"),
+      template: "%s",
+    },
     description: t(locale, "meta.description"),
-    alternates: { canonical: "/" },
   };
 }
 

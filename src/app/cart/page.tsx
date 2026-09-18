@@ -161,10 +161,11 @@ export default function CartPage() {
       <div className="mt-8 flex flex-col items-end gap-2">
         <p className="text-sm text-muted-foreground">{t("cart.subtotal", { amount: mad(subtotal) })}</p>
         {discount > 0 ? <p className="text-sm">{t("cart.couponLine", { amount: mad(discount) })}</p> : null}
+        <p className="text-sm text-muted-foreground">{t("cart.shippingFree")}</p>
         <p className="text-lg">
           {t("cart.total")} <span className="font-medium">{mad(total)}</span>
         </p>
-        <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "inline-flex")}>
+        <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "inline-flex h-12")}>
           {t("cart.checkout")}
         </Link>
       </div>
